@@ -339,7 +339,19 @@ webrtcPeerConnectionInterfaceAddTrack(WebrtcPeerConnectionInterface* connection,
   return cresult;
 }
 
-extern "C" void webrtcPeerConnectionInterfaceClose(
+RTC_EXPORT extern "C" bool webrtcPeerConnectionInterfaceAddICECandidate(
+    WebrtcPeerConnectionInterface* connection,
+    const char* sdpMid,
+    size_t sdpMLineIndex,
+    const char* sdp) {
+  webrtc::SdpParseError error;
+  webrtc::IceCandidateInterface* candidate =
+      webrtc::CreateIceCandidate(sdpMid, sdpMLineIndex, sdp, &error);
+
+  return rtc::ToCplusplus(connection)->AddIceCandidate(candidate);
+}
+
+RTC_EXPORT extern "C" void webrtcPeerConnectionInterfaceClose(
     WebrtcPeerConnectionInterface* connection) {
   rtc::ToCplusplus(connection)->Close();
 }
