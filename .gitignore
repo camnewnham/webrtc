@@ -78,3 +78,4 @@
 /xcodebuild
 /.vscode
 !webrtc/*
+.vs/

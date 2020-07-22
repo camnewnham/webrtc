@@ -10,11 +10,6 @@ using System.Runtime.InteropServices;
 
 namespace Pixiv.Webrtc
 {
-    public interface IAudioDeviceModule
-    {
-        IntPtr Ptr { get; }
-    }
-
     public interface IAudioProcessing
     {
         IntPtr Ptr { get; }

@@ -8,6 +8,8 @@
 #include <cstdlib>
 #include "api/peer_connection_interface.h"
 #include "sdk/c/api/peer_connection_interface.h"
+#include "sdk/c/modules/audio_device.h"
+#include <api\task_queue\default_task_queue_factory.h>
 
 namespace webrtc {
 
@@ -374,6 +376,12 @@ extern "C" void webrtcPeerConnectionInterfaceSetAudioRecording(
   rtc::ToCplusplus(connection)->SetAudioRecording(recording);
 }
 
+extern "C" void webrtcPeerConnectionInterfaceSetAudioPlayout(
+    WebrtcPeerConnectionInterface* connection,
+    bool playout) {
+  rtc::ToCplusplus(connection)->SetAudioPlayout(playout);
+}
+
 extern "C" void webrtcPeerConnectionInterfaceSetLocalDescription(
     WebrtcPeerConnectionInterface* connection,
     WebrtcSetSessionDescriptionObserver* observer,
@@ -406,3 +414,50 @@ extern "C" size_t webrtcRtpSenderInterfacesSize(
     const WebrtcRtpSenderInterfaces* interfaces) {
   return rtc::ToCplusplus(interfaces)->size();
 }
+
+extern "C" WebrtcAudioDeviceModule* webrtcCreateDefaultAudioDeviceModule() {
+  auto task_queue_factory = webrtc::CreateDefaultTaskQueueFactory();
+  return rtc::ToC(webrtc::AudioDeviceModule::Create(
+                      webrtc::AudioDeviceModule::kPlatformDefaultAudio,
+                      task_queue_factory.get())
+                      .release());
+}
+
+extern "C" uint16_t webrtcAudioDeviceModulePlayoutDevices(
+    WebrtcAudioDeviceModule* adm) {
+  return rtc::ToCplusplus(adm)->PlayoutDevices();
+}
+
+extern "C" uint16_t webrtcAudioDeviceModuleRecordingDevices(
+    WebrtcAudioDeviceModule* adm) {
+  return rtc::ToCplusplus(adm)->RecordingDevices();
+}
+
+extern "C" int32_t webrtcAudioDeviceModuleSetPlayoutDevice(
+    WebrtcAudioDeviceModule* adm,
+    uint16_t index) {
+  return rtc::ToCplusplus(adm)->SetPlayoutDevice(index);
+}
+
+extern "C" int32_t webrtcAudioDeviceModuleSetRecordingDevice(
+    WebrtcAudioDeviceModule* adm,
+    uint16_t index) {
+  return rtc::ToCplusplus(adm)->SetRecordingDevice(index);
+}
+
+extern "C" int32_t webrtcAudioDeviceModulePlayoutDeviceName(
+    WebrtcAudioDeviceModule* adm,
+    uint16_t index,
+    char* name,
+    char* guid) {
+  return rtc::ToCplusplus(adm)->PlayoutDeviceName(index, name, guid);
+}
+
+extern "C" int32_t webrtcAudioDeviceModuleRecordingDeviceName(
+    WebrtcAudioDeviceModule* adm,
+    uint16_t index,
+    char* name,
+    char* guid) {
+  return rtc::ToCplusplus(adm)->RecordingDeviceName(index, name, guid);
+}
+

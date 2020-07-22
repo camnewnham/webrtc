@@ -1005,6 +1005,12 @@ namespace Pixiv.Webrtc
         );
 
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void webrtcPeerConnectionInterfaceSetAudioPlayout(
+            IntPtr connection,
+            [MarshalAs(UnmanagedType.I1)] bool playout
+        );
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
         private static extern void webrtcPeerConnectionInterfaceSetLocalDescription(
             IntPtr connection,
             IntPtr observer,
@@ -1193,6 +1199,23 @@ namespace Pixiv.Webrtc
             webrtcPeerConnectionInterfaceSetAudioRecording(
                 connection.Ptr,
                 recording
+            );
+
+            GC.KeepAlive(connection);
+        }
+
+        public static void SetAudioPlayout(
+            this IPeerConnectionInterface connection,
+            bool playout)
+        {
+            if (connection == null)
+            {
+                throw new ArgumentNullException(nameof(connection));
+            }
+
+            webrtcPeerConnectionInterfaceSetAudioPlayout(
+                connection.Ptr,
+                playout
             );
 
             GC.KeepAlive(connection);

@@ -25,7 +25,8 @@ webrtcCreatePeerConnectionFactory(
   return rtc::ToC(
       webrtc::CreatePeerConnectionFactory(
           rtc::ToCplusplus(network_thread), rtc::ToCplusplus(worker_thread),
-          rtc::ToCplusplus(signaling_thread), rtc::ToCplusplus(default_adm),
+          rtc::ToCplusplus(signaling_thread),
+          rtc::ToCplusplus(default_adm),
           rtc::ToCplusplus(audio_encoder_factory),
           rtc::ToCplusplus(audio_decoder_factory),
           std::unique_ptr<webrtc::VideoEncoderFactory>(

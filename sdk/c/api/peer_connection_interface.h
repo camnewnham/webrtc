@@ -336,6 +336,10 @@ RTC_EXPORT void webrtcPeerConnectionInterfaceSetAudioRecording(
     WebrtcPeerConnectionInterface* connection,
     bool recording);
 
+RTC_EXPORT void webrtcPeerConnectionInterfaceSetAudioPlayout(
+    WebrtcPeerConnectionInterface* connection,
+    bool playout);
+
 RTC_EXPORT void webrtcPeerConnectionInterfaceSetLocalDescription(
     WebrtcPeerConnectionInterface* connection,
     WebrtcSetSessionDescriptionObserver* observer,

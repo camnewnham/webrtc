@@ -4,6 +4,9 @@
     Use of this source code is governed by a BSD-style license
     that can be found in the LICENSE file in the root of the source
     tree.
+	
+	AVAILABLE TARGETS Android;Ios;LinuxX64;MacX64;WinX64
+	AVAILABLE CONFIGURATIONS Debug, Release
 -->
 
 <Project>
@@ -16,7 +19,7 @@
     <PropertyGroup>
         <IsDebug Condition="'$(Configuration)' == Debug">true</IsDebug>
         <IsDebug Condition="'$(Configuration)' != Debug">false</IsDebug>
-        <Targets>Android;Ios;LinuxX64;MacX64;WinX64</Targets>
+        <Targets>WinX64;</Targets>
         <ParsibleTargets>;$(Targets);</ParsibleTargets>
         <SourceRootPath>$(MSBuildThisFileDirectory)../../../</SourceRootPath>
         <EscapedIntermediateOutputPath>"$(IntermediateOutputPath.Replace('\', '\\').Replace('"', '\"'))"</EscapedIntermediateOutputPath>

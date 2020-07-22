@@ -124,6 +124,26 @@ RTC_EXPORT WebrtcAudioSourceInterface* webrtcNewAudioSourceInterface(
     void* context,
     const struct AudioSourceInterfaceFunctions* functions);
 
+RTC_EXPORT WebrtcAudioTrackSinkInterface* webrtcNewRingBufferAudioTrackSink(
+    void* context,
+    int size);
+
+RTC_EXPORT int webrtcRingBufferAudioTrackSinkAvailale(
+    WebrtcAudioTrackSinkInterface* sink);
+
+RTC_EXPORT const void* webrtcRingBufferAudioTrackSinkInfo(
+    WebrtcAudioTrackSinkInterface* sink);
+
+RTC_EXPORT const void* webrtcRingBufferAudioTrackSinkData(
+    WebrtcAudioTrackSinkInterface* sink);
+
+RTC_EXPORT void webrtcRingBufferAudioTrackSinkAdvance(
+    WebrtcAudioTrackSinkInterface* sink,
+    int amount);
+
+RTC_EXPORT void webrtcDeleteRingBufferAudioTrackSink(
+    WebrtcAudioTrackSinkInterface* sink);
+
 RTC_EXPORT void webrtcVideoTrackInterfaceAddOrUpdateSink(
     WebrtcVideoTrackInterface* track,
     RtcVideoSinkInterface* sink,

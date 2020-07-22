@@ -302,8 +302,75 @@ namespace Pixiv.Webrtc
         }
     }
 
+    public class RingBufferAudioTrackSink : IAudioTrackSinkInterface
+    {
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr webrtcNewRingBufferAudioTrackSink(IntPtr context, int size);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void webrtcDeleteRingBufferAudioTrackSink(IntPtr sink);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int webrtcRingBufferAudioTrackSinkAvailale(IntPtr sink);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr webrtcRingBufferAudioTrackSinkInfo(IntPtr sink);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr webrtcRingBufferAudioTrackSinkData(IntPtr sink);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void webrtcRingBufferAudioTrackSinkAdvance(IntPtr sink, int amount);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct AudioInfo
+        {
+            public int bits_per_sample;
+            public int number_of_channels;
+            public int sample_rate;
+        }
+
+        public RingBufferAudioTrackSink(int buffersize)
+        {
+            Ptr = webrtcNewRingBufferAudioTrackSink((IntPtr)GCHandle.Alloc(this), buffersize);
+        }
+
+        public int Available
+        {
+            get
+            {
+                return webrtcRingBufferAudioTrackSinkAvailale(Ptr);
+            }
+        }
+
+        public IntPtr Data
+        {
+            get
+            {
+                return webrtcRingBufferAudioTrackSinkData(Ptr);
+            }
+        }
+
+        public AudioInfo Info
+        {
+            get
+            {
+                return Marshal.PtrToStructure<AudioInfo>(webrtcRingBufferAudioTrackSinkInfo(Ptr));
+            }
+        }
+
+        public void Advance(int amount)
+        {
+            webrtcRingBufferAudioTrackSinkAdvance(Ptr, amount);
+        }
+
+        public IntPtr Ptr { get; private set; }
+    }
+
+
     public sealed class AudioTrackSinkInterface : IAudioTrackSinkInterface
     {
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void ManagedDataHandler(
             IntPtr audioData,
             int bitsPerSample,

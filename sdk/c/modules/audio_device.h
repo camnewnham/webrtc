@@ -16,4 +16,33 @@
 
 RTC_C_CLASS(webrtc::AudioDeviceModule, WebrtcAudioDeviceModule)
 
+extern "C" {
+
+RTC_EXPORT WebrtcAudioDeviceModule* webrtcCreateDefaultAudioDeviceModule();
+
+RTC_EXPORT uint16_t
+webrtcAudioDeviceModulePlayoutDevices(WebrtcAudioDeviceModule* adm);
+
+RTC_EXPORT uint16_t
+webrtcAudioDeviceModuleRecordingDevices(WebrtcAudioDeviceModule* adm);
+
+RTC_EXPORT int32_t
+webrtcAudioDeviceModuleSetPlayoutDevice(WebrtcAudioDeviceModule* adm,
+                                        uint16_t index);
+
+RTC_EXPORT int32_t
+webrtcAudioDeviceModuleSetRecordingDevice(WebrtcAudioDeviceModule* adm,
+                                          uint16_t index);
+
+RTC_EXPORT int32_t
+webrtcAudioDeviceModulePlayoutDeviceName(WebrtcAudioDeviceModule* adm,
+                                         uint16_t index,
+                                         char* name,
+                                         char* guid);
+RTC_EXPORT int32_t
+webrtcAudioDeviceModuleRecordingDeviceName(WebrtcAudioDeviceModule* adm,
+                                           uint16_t index,
+                                           char* name,
+                                           char* guid);
+}
 #endif
