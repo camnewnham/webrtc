@@ -135,15 +135,6 @@ namespace Pixiv.Rtc
         {
         }
 
-        ~DisposablePtr()
-        {
-            if (_ptr == IntPtr.Zero)
-            {
-                return;
-            }
-            FreePtr();
-        }
-
         public void Dispose()
         {
             if (_ptr == IntPtr.Zero)
