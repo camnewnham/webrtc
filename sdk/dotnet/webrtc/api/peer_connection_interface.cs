@@ -1035,6 +1035,16 @@ namespace Pixiv.Webrtc
             IntPtr interfaces
         );
 
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr webrtcPeerConnectionCreateDataChannel(
+            IntPtr connection,
+            int id,
+            int maxRetransmitTime,
+            bool ordered,
+            string protocol,
+            string label
+        );
+
         public static bool AddIceCandidate(
             this IPeerConnectionInterface connection,
             IIceCandidateInterface candidate)
@@ -1275,6 +1285,11 @@ namespace Pixiv.Webrtc
             GC.KeepAlive(connection);
             GC.KeepAlive(observer);
             desc.ReleasePtr();
+        }
+
+        public static DisposableDataChannelInterface CreateDataChannel(this IPeerConnectionInterface connection, string label, int id, int maxRetransmitTime, bool ordered, string protocol)
+        {
+            return new DisposableDataChannelInterface(webrtcPeerConnectionCreateDataChannel(connection.Ptr, id, maxRetransmitTime, ordered, protocol, label));
         }
     }
 }

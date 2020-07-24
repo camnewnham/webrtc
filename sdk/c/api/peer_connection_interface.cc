@@ -473,3 +473,26 @@ extern "C" int32_t webrtcAudioDeviceModuleRecordingDeviceName(
   return rtc::ToCplusplus(adm)->RecordingDeviceName(index, name, guid);
 }
 
+extern "C" WebrtcDataChannelInterface* webrtcPeerConnectionCreateDataChannel(
+    WebrtcPeerConnectionInterface* connection,
+    int id,
+    int maxRetransmitTime,
+    bool ordered,
+    const char* protocol,
+    const char* label) {
+  webrtc::DataChannelInit config;
+  if (id >= 0) {
+    config.id = id;
+    config.negotiated = true;
+  }
+  if (maxRetransmitTime >= 0) {
+    config.maxRetransmitTime = maxRetransmitTime;
+  }
+  config.ordered = ordered;
+  config.protocol = std::string(protocol);
+  auto ptr = rtc::ToCplusplus(connection)
+                       ->CreateDataChannel(std::string(label), &config)
+                       .release();
+  return rtc::ToC(ptr);
+}
+

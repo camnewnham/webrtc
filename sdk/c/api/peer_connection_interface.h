@@ -357,6 +357,14 @@ RTC_EXPORT void webrtcRtpSenderInterfacesMove(
 RTC_EXPORT size_t webrtcRtpSenderInterfacesSize(
     const WebrtcRtpSenderInterfaces* interfaces);
 
+RTC_EXPORT WebrtcDataChannelInterface* webrtcPeerConnectionCreateDataChannel(
+    WebrtcPeerConnectionInterface* connection,
+    int id,
+    int maxRetransmitTime,
+    bool ordered,
+    const char* protocol,
+    const char* label);
+
 #ifdef __cplusplus
 }
 #endif

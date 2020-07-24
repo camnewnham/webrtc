@@ -20,6 +20,50 @@ namespace Pixiv.Webrtc
     {
     }
 
+    public interface IDataChannelObserver
+    {
+        void OnStateChange();
+        void OnMessage(bool binary, IntPtr data, int size);
+        void OnBufferedAmountChange(UInt64 amount);
+        void OnObserverDestroyed();
+    }
+
+    public sealed class DisposableDataChannelObserver
+    {
+        private delegate void OnDestructionDelegate(IntPtr context);
+        private delegate void OnStateChangeDelegate(IntPtr context);
+        private delegate void OnMessageDelegate(IntPtr context, bool binary, IntPtr data, int length);
+        private delegate void OnBufferedAmountChangeDelegate(IntPtr context, UInt64 sent_data_size);
+
+        private static FunctionPtrArray functions = new FunctionPtrArray(
+            (OnDestructionDelegate)ObserverDestroyed,
+            (OnStateChangeDelegate)StateChange,
+            (OnMessageDelegate)Message,
+            (OnBufferedAmountChangeDelegate)BufferedAmountChange);
+
+        public static IntPtr FunctionsPtr { get { return functions.Ptr; } }
+
+        private static void ObserverDestroyed(IntPtr context)
+        {
+            (((GCHandle)context).Target as IDataChannelObserver).OnObserverDestroyed();
+        }
+
+        private static void StateChange(IntPtr context)
+        {
+            (((GCHandle)context).Target as IDataChannelObserver).OnStateChange();
+        }
+
+        private static void Message(IntPtr context, bool binary, IntPtr data, int length)
+        {
+            (((GCHandle)context).Target as IDataChannelObserver).OnMessage(binary, data, length);
+        }
+
+        private static void BufferedAmountChange(IntPtr context, UInt64 sent_data_size)
+        {
+            (((GCHandle)context).Target as IDataChannelObserver).OnBufferedAmountChange(sent_data_size);
+        }
+    }
+   
     public sealed class DisposableDataChannelInterface :
         DisposablePtr, IDisposableDataChannelInterface
     {
@@ -43,12 +87,14 @@ namespace Pixiv.Webrtc
             }
         }
     }
+
     public static class DataChannelInterfaceExtension
     {
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr webrtcDataChannelRegisterObserver(IntPtr s, IntPtr o);
+        private static extern IntPtr webrtcDataChannelRegisterObserverFunctions(IntPtr channel, IntPtr context, IntPtr functionsArray);
+
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void webrtcDataChannelUnRegisterObserver(IntPtr s);
+        private static extern void webrtcDataChannelUnRegisterObserver(IntPtr channel);
 
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr webrtcDataChannelLabel(
@@ -81,12 +127,12 @@ namespace Pixiv.Webrtc
             return webrtcDataChannelStatus(channel.Ptr);
         }
 
-        public static bool Send(this IDisposableDataChannelInterface channel, byte[] data)
+        public static bool Send(this IDisposableDataChannelInterface channel, byte[] data, int offset, int length)
         {
             var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
             try
             {
-                return webrtcDataChannelSendData(channel.Ptr, handle.AddrOfPinnedObject(), data.Length);
+                return webrtcDataChannelSendData(channel.Ptr, IntPtr.Add(handle.AddrOfPinnedObject(), offset), length);
             }
             finally
             {
@@ -102,6 +148,11 @@ namespace Pixiv.Webrtc
         public static void UnRegisterObserver(this IDisposableDataChannelInterface channel)
         {
             webrtcDataChannelUnRegisterObserver(channel.Ptr);
+        }
+
+        public static IntPtr RegisterObserver(this IDisposableDataChannelInterface channel, IDataChannelObserver observer)
+        {
+            return webrtcDataChannelRegisterObserverFunctions(channel.Ptr, (IntPtr)GCHandle.Alloc(observer), DisposableDataChannelObserver.FunctionsPtr);
         }
     }
 }

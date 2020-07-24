@@ -19,10 +19,10 @@ RTC_C_CLASS(webrtc::DataChannelInterface, WebrtcDataChannelInterface)
 RTC_C_CLASS(webrtc::DataChannelObserver, WebrtcDataChannelObserver)
 
 struct WebrtcDataChannelObserverFunctions {
-  void (*on_destruction)(void*);
-  void (*on_state_change)(void*);
-  void (*on_message)(void*, bool binary, const uint8_t* data, size_t len);
-  void (*on_buffered_amount_change)(void*, uint64_t);
+  void (*on_destruction)(void* context);
+  void (*on_state_change)(void* context);
+  void (*on_message)(void* context, bool binary, const uint8_t* data, int len);
+  void (*on_buffered_amount_change)(void* context, uint64_t sent_data_size);
 };
 
 RTC_EXPORT void webrtcDataChannelInterfaceRelease(
@@ -43,14 +43,13 @@ RTC_EXPORT bool webrtcDataChannelSendData(
     const char* data,
     size_t len);
 
-RTC_EXPORT WebrtcDataChannelObserver* webrtcDataChannelRegisterObserver(
-    void* context,
+RTC_EXPORT WebrtcDataChannelObserver* webrtcDataChannelRegisterObserverFunctions(
     WebrtcDataChannelInterface* channel,
+    void* context,
     const struct WebrtcDataChannelObserverFunctions* functions);
 
-RTC_EXPORT void webrtcDataChannelUnregisterObserver(
+RTC_EXPORT void webrtcDataChannelUnRegisterObserver(
     WebrtcDataChannelInterface* channel);
-
 
 #ifdef __cplusplus
 }

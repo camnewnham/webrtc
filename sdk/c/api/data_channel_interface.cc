@@ -9,26 +9,24 @@
 
 namespace webrtc {
 
-class DelegatingDataChannelObserver
-    : public DataChannelObserver {
+class DelegatingDataChannelObserver : public DataChannelObserver {
  public:
   DelegatingDataChannelObserver(
       void* context,
       const struct WebrtcDataChannelObserverFunctions* functions) {
     context_ = context;
-    functions_ = functions;
+    functions_ = new WebrtcDataChannelObserverFunctions(*functions);
   }
 
   ~DelegatingDataChannelObserver() {
     functions_->on_destruction(context_);
+    delete functions_;
   }
 
-  void OnStateChange() override {
-    functions_->on_state_change(context_);
-  }
+  void OnStateChange() override { functions_->on_state_change(context_); }
 
   void OnMessage(const DataBuffer& buffer) override {
-    auto * data = buffer.data.data();
+    auto data = buffer.data.data();
     functions_->on_message(context_, buffer.binary, data, buffer.size());
   }
 
@@ -39,8 +37,8 @@ class DelegatingDataChannelObserver
  private:
   void* context_;
   const struct WebrtcDataChannelObserverFunctions* functions_;
-  };
-}
+};
+}  // namespace webrtc
 
 RTC_EXPORT extern "C" void webrtcDataChannelInterfaceRelease(
     const WebrtcDataChannelInterface* channel) {
@@ -70,29 +68,27 @@ RTC_EXPORT extern "C" bool webrtcDataChannelSendText(
 RTC_EXPORT extern "C" bool webrtcDataChannelSendData(
     WebrtcDataChannelInterface* channel,
     const char* data,
-    size_t len
-    ) {
-      auto chan = rtc::ToCplusplus(channel);
-      rtc::CopyOnWriteBuffer writeBuffer(data, len);
-      const auto db = webrtc::DataBuffer(writeBuffer, true);
-      return chan->Send(db);
-    }
+    size_t len) {
+  auto chan = rtc::ToCplusplus(channel);
+  rtc::CopyOnWriteBuffer writeBuffer(data, len);
+  const auto db = webrtc::DataBuffer(writeBuffer, true);
+  return chan->Send(db);
+}
     
-RTC_EXPORT extern "C" WebrtcDataChannelObserver* webrtcDataChannelRegisterObserver(
-    void* context,
+RTC_EXPORT extern "C" WebrtcDataChannelObserver*
+webrtcDataChannelRegisterObserverFunctions(
     WebrtcDataChannelInterface* channel,
+    void* context,
     const struct WebrtcDataChannelObserverFunctions* functions) {
-
-      auto chan = rtc::ToCplusplus(channel);
-      auto obs = new webrtc::DelegatingDataChannelObserver(context, functions);
-      chan->RegisterObserver(obs);
-      auto o = rtc::ToC(obs);
-      return o;
+  auto chan = rtc::ToCplusplus(channel);
+  auto obs = new webrtc::DelegatingDataChannelObserver(context, functions);
+  chan->RegisterObserver(obs);
+  auto o = rtc::ToC(obs);
+  return o;
 }
 
-RTC_EXPORT extern "C" void webrtcDataChannelUnregisterObserver(
-    WebrtcDataChannelInterface* channel
-    ) {
-      auto chan = rtc::ToCplusplus(channel);
-      chan->UnregisterObserver();
+RTC_EXPORT extern "C" void webrtcDataChannelUnRegisterObserver(
+    WebrtcDataChannelInterface* channel) {
+  auto chan = rtc::ToCplusplus(channel);
+  chan->UnregisterObserver();
 }
