@@ -7,6 +7,7 @@
 
 #include <cstdlib>
 #include "api/peer_connection_interface.h"
+#include "api/proxy.h"
 #include "sdk/c/api/peer_connection_interface.h"
 #include "sdk/c/modules/audio_device.h"
 #include <api\task_queue\default_task_queue_factory.h>
@@ -282,6 +283,14 @@ webrtcPeerConnectionFactoryInterfaceCreatePeerConnection(
   return rtc::ToC(connection.release());
 }
 
+extern "C" WebrtcAudioSourceInterface*
+webrtcPeerConnectionFactoryInterfaceCreateAudioSource(
+    WebrtcPeerConnectionFactoryInterface* factory) {
+  cricket::AudioOptions options;
+  return rtc::ToC(
+      rtc::ToCplusplus(factory)->CreateAudioSource(options).release());
+}
+
 extern "C" WebrtcAudioTrackInterface*
 webrtcPeerConnectionFactoryInterfaceCreateAudioTrack(
     WebrtcPeerConnectionFactoryInterface* factory,
@@ -427,12 +436,26 @@ extern "C" size_t webrtcRtpSenderInterfacesSize(
   return rtc::ToCplusplus(interfaces)->size();
 }
 
-extern "C" WebrtcAudioDeviceModule* webrtcCreateDefaultAudioDeviceModule() {
-  auto task_queue_factory = webrtc::CreateDefaultTaskQueueFactory();
-  return rtc::ToC(webrtc::AudioDeviceModule::Create(
-                      webrtc::AudioDeviceModule::kPlatformDefaultAudio,
-                      task_queue_factory.get())
-                      .release());
+class webrtcAudioDeviceModuleFactory {
+ public:
+  rtc::scoped_refptr<webrtc::AudioDeviceModule> createAudioDeviceModule() {
+    auto task_queue_factory = webrtc::CreateDefaultTaskQueueFactory();
+    auto adm = webrtc::AudioDeviceModule::Create(
+               webrtc::AudioDeviceModule::kPlatformDefaultAudio,
+               task_queue_factory.get());
+    return adm;
+  }
+};
+
+extern "C" WebrtcAudioDeviceModule* webrtcCreateDefaultAudioDeviceModule(rtc::Thread* thread) {
+  webrtcAudioDeviceModuleFactory* factory =
+      new webrtcAudioDeviceModuleFactory();
+    webrtc::MethodCall0< webrtcAudioDeviceModuleFactory,
+      rtc::scoped_refptr<webrtc::AudioDeviceModule>> call(
+          factory, &webrtcAudioDeviceModuleFactory::createAudioDeviceModule);
+  auto r = call.Marshal(RTC_FROM_HERE, thread); 
+  return rtc::ToC(r.release());
+  delete factory;
 }
 
 extern "C" uint16_t webrtcAudioDeviceModulePlayoutDevices(
@@ -471,6 +494,15 @@ extern "C" int32_t webrtcAudioDeviceModuleRecordingDeviceName(
     char* name,
     char* guid) {
   return rtc::ToCplusplus(adm)->RecordingDeviceName(index, name, guid);
+}
+
+extern "C" void webrtcAudioDeviceModuleSetSpeakerVolume(
+    WebrtcAudioDeviceModule * adm,
+    float volume) {
+  uint32_t max;
+  rtc::ToCplusplus(adm)->MaxSpeakerVolume(&max);
+  uint32_t v = (float)max * volume;
+  rtc::ToCplusplus(adm)->SetSpeakerVolume(v);
 }
 
 extern "C" WebrtcDataChannelInterface* webrtcPeerConnectionCreateDataChannel(

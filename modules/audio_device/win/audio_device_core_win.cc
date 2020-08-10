@@ -2631,7 +2631,8 @@ int32_t AudioDeviceWindowsCore::PlayoutDelay(uint16_t& delayMS) const {
 }
 
 bool AudioDeviceWindowsCore::BuiltInAECIsAvailable() const {
-  return _dmo != nullptr;
+  return false; // disable in-built AEC on Windows because this will soon be
+  //deprecated, and it also inteferes with one-way audio (ISSUE #6)
 }
 
 // ----------------------------------------------------------------------------

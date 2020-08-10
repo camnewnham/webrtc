@@ -77,6 +77,13 @@ RTC_EXPORT void webrtcAudioTrackInterfaceAddSink(
     WebrtcAudioTrackInterface* track,
     WebrtcAudioTrackSinkInterface* sink);
 
+RTC_EXPORT WebrtcAudioSourceInterface* webrtcAudioTrackInterfaceGetSource(
+    WebrtcAudioTrackInterface* track);
+
+RTC_EXPORT void webrtcAudioSourceInterfaceSetVolume(
+    WebrtcAudioSourceInterface* source,
+    double volume);
+
 RTC_EXPORT WebrtcMediaStreamTrackInterface*
 webrtcAudioTrackInterfaceToWebrtcMediaStreamTrackInterface(
     WebrtcAudioTrackInterface* track);

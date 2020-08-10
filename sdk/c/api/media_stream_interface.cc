@@ -190,6 +190,16 @@ extern "C" void webrtcAudioTrackInterfaceAddSink(
   rtc::ToCplusplus(track)->AddSink(rtc::ToCplusplus(sink));
 }
 
+extern "C" WebrtcAudioSourceInterface* webrtcAudioTrackInterfaceGetSource(
+    WebrtcAudioTrackInterface * track) {
+  return rtc::ToC(rtc::ToCplusplus(track)->GetSource());
+}
+
+extern "C" void webrtcAudioSourceInterfaceSetVolume(
+    WebrtcAudioSourceInterface* source, double volume) {
+  rtc::ToCplusplus(source)->SetVolume(volume);
+}
+
 extern "C" WebrtcMediaStreamTrackInterface*
 webrtcAudioTrackInterfaceToWebrtcMediaStreamTrackInterface(
     WebrtcAudioTrackInterface* track) {

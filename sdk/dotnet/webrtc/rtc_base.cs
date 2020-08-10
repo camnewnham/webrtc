@@ -92,7 +92,6 @@ namespace Pixiv.Rtc
 
     public interface IThread : IMessageQueue
     {
-
         new IntPtr Ptr { get; }
     }
 

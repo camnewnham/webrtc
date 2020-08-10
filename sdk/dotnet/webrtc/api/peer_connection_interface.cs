@@ -482,6 +482,28 @@ namespace Pixiv.Webrtc
             public SdpSemantics SdpSemantics;
         }
 
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr webrtcPeerConnectionFactoryInterfaceCreatePeerConnection(
+            IntPtr factory,
+            in WebrtcRTCConfiguration configuration,
+            in WebrtcPeerConnectionDependencies dependencies);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr webrtcPeerConnectionFactoryInterfaceCreateAudioTrack(
+            IntPtr factory,
+            string label,
+            IntPtr source);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr webrtcPeerConnectionFactoryInterfaceCreateVideoTrack(
+            IntPtr factory,
+            string label,
+            IntPtr source);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr webrtcPeerConnectionFactoryInterfaceCreateAudioSource(
+            IntPtr factory);
+
         private static IntPtr StringArrayToHGlobalAnsiArrayPtr(string[] array)
         {
             var sizeOfIntPtr = Marshal.SizeOf<IntPtr>();
@@ -514,23 +536,10 @@ namespace Pixiv.Webrtc
             Marshal.FreeHGlobal(ptr);
         }
 
-        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr webrtcPeerConnectionFactoryInterfaceCreatePeerConnection(
-            IntPtr factory,
-            in WebrtcRTCConfiguration configuration,
-            in WebrtcPeerConnectionDependencies dependencies);
-
-        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr webrtcPeerConnectionFactoryInterfaceCreateAudioTrack(
-            IntPtr factory,
-            string label,
-            IntPtr source);
-
-        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr webrtcPeerConnectionFactoryInterfaceCreateVideoTrack(
-            IntPtr factory,
-            string label,
-            IntPtr source);
+        public static IAudioSourceInterface CreateAudioSource(this IPeerConnectionFactoryInterface factory)
+        {
+            return new LocalAudioSource(webrtcPeerConnectionFactoryInterfaceCreateAudioSource(factory.Ptr));
+        }
 
         public static DisposablePeerConnectionInterface CreatePeerConnection(
             this IPeerConnectionFactoryInterface factory,

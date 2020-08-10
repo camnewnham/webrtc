@@ -158,6 +158,7 @@
         <MakeDir Directories="$(IntermediateOutputPath)desc/win_x64" />
         <Exec Command="gn desc --all --format=json $(EscapedIntermediateOutputPath)build/win_x64 //:jingle_peerconnection_so > $(EscapedIntermediateOutputPath)desc/win_x64/jingle_peerconnection_so.json" />
         <Copy DestinationFolder="$(OutputPath)Runtime" SourceFiles="$(IntermediateOutputPath)build/win_x64/jingle_peerconnection_so.dll;$(MSBuildThisFileDirectory)Runtime/jingle_peerconnection_so.dll.meta" />
+		<Copy DestinationFolder="$(OutputPath)Runtime" SourceFiles="$(IntermediateOutputPath)build/win_x64/jingle_peerconnection_so.dll.pdb" Condition="'$(Configuration)' == Debug" />
     </Target>
     <Target Name="Restore">
         <ConvertToAbsolutePath Paths="$(BaseIntermediateOutputPath)">

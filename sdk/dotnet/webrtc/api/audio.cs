@@ -5,7 +5,9 @@
  *  found in the LICENSE.pixiv file in the root of the source tree.
  */
 
+using Pixiv.Rtc;
 using System;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -52,6 +54,9 @@ namespace Pixiv.Webrtc
             StringBuilder name,
             StringBuilder guid);
 
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void webrtcAudioDeviceModuleSetSpeakerVolume(IntPtr adm, float volume);
+
         public AudioDeviceModule(IntPtr ptr)
         {
             this.Ptr = ptr;
@@ -75,6 +80,11 @@ namespace Pixiv.Webrtc
         public Int32 SetRecordingDevice(UInt16 index)
         {
             return webrtcAudioDeviceModuleSetRecordingDevice(Ptr, index);
+        }
+
+        public void SetSpeakerVolume(float volume)
+        {
+            webrtcAudioDeviceModuleSetSpeakerVolume(Ptr, volume);
         }
 
         public struct AudioDeviceName
@@ -116,17 +126,16 @@ namespace Pixiv.Webrtc
                 name = name.ToString()
             };
         }
-
     }
 
     public static class AudioDeviceModuleFactory
     {
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr webrtcCreateDefaultAudioDeviceModule();
+        private static extern IntPtr webrtcCreateDefaultAudioDeviceModule(IntPtr rtcthread);
 
-        public static AudioDeviceModule CreateDefault()
+        public static AudioDeviceModule CreateDefault(IThread thread)
         {
-            return new AudioDeviceModule(webrtcCreateDefaultAudioDeviceModule());
+            return new AudioDeviceModule(webrtcCreateDefaultAudioDeviceModule(thread.Ptr));
         }
     }
 }

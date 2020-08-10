@@ -288,6 +288,10 @@ webrtcPeerConnectionFactoryInterfaceCreatePeerConnection(
     const struct WebrtcPeerConnectionInterfaceRTCConfiguration* cconfiguration,
     const struct WebrtcPeerConnectionDependencies* cdependencies);
 
+RTC_EXPORT WebrtcAudioSourceInterface*
+webrtcPeerConnectionFactoryInterfaceCreateAudioSource(
+    WebrtcPeerConnectionFactoryInterface* factory);
+
 RTC_EXPORT WebrtcAudioTrackInterface*
 webrtcPeerConnectionFactoryInterfaceCreateAudioTrack(
     WebrtcPeerConnectionFactoryInterface* factory,

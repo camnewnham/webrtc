@@ -6,6 +6,7 @@
  */
 
 using Pixiv.Rtc;
+using Pixiv.Webrtc.Interop;
 using System;
 using System.Runtime.InteropServices;
 
@@ -302,6 +303,17 @@ namespace Pixiv.Webrtc
         }
     }
 
+    public class LocalAudioSource : IAudioSourceInterface
+    {
+        public IntPtr Ptr { get; private set; }
+
+        public LocalAudioSource(IntPtr ptr)
+        {
+            Ptr = ptr;
+        }
+    }
+
+
     public class RingBufferAudioTrackSink : IAudioTrackSinkInterface
     {
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
@@ -475,6 +487,11 @@ namespace Pixiv.Webrtc
             IntPtr sink
         );
 
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr webrtcAudioTrackInterfaceGetSource(
+            IntPtr track
+        );
+
         public static void AddSink(
             this IAudioTrackInterface track,
             IAudioTrackSinkInterface sink)
@@ -493,6 +510,12 @@ namespace Pixiv.Webrtc
             GC.KeepAlive(track);
             GC.KeepAlive(sink);
         }
+
+        public static AudioSourceInterface GetSource(this IAudioTrackInterface track)
+        {
+            return new AudioSourceInterface(webrtcAudioTrackInterfaceGetSource(track.Ptr));
+        }
+
     }
 
     public static class MediaStreamTrackInterfaceExtension
@@ -588,10 +611,25 @@ namespace Pixiv.Webrtc
 
 namespace Pixiv.Webrtc.Interop
 {
-    public static class AudioSourceInterface
+    public class AudioSourceInterface
     {
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl, EntryPoint = "webrtcAudioSourceInterfaceToWebrtcMediaSourceInterface")]
         public static extern IntPtr ToWebrtcMediaSourceInterface(IntPtr ptr);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void webrtcAudioSourceInterfaceSetVolume(IntPtr source, double volume);
+
+        public IntPtr Ptr;
+
+        public AudioSourceInterface(IntPtr ptr)
+        {
+            this.Ptr = ptr;
+        }
+
+        public void SetVolume(double volume)
+        {
+            webrtcAudioSourceInterfaceSetVolume(Ptr, volume);
+        }
     }
 
     public static class AudioTrackInterface
