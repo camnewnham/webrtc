@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "webrtc": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
