@@ -27,6 +27,30 @@ webrtcAudioDeviceModulePlayoutDevices(WebrtcAudioDeviceModule* adm);
 RTC_EXPORT uint16_t
 webrtcAudioDeviceModuleRecordingDevices(WebrtcAudioDeviceModule* adm);
 
+RTC_EXPORT void webrtcAudioDeviceModuleInitPlayout(
+    WebrtcAudioDeviceModule* adm,
+    rtc::Thread* thread);
+
+RTC_EXPORT void webrtcAudioDeviceModuleStartPlayout(
+    WebrtcAudioDeviceModule* adm,
+    rtc::Thread* thread);
+
+RTC_EXPORT void webrtcAudioDeviceModuleStopPlayout(
+    WebrtcAudioDeviceModule* adm,         
+    rtc::Thread* thread);
+
+RTC_EXPORT void webrtcAudioDeviceModuleInitRecording(
+    WebrtcAudioDeviceModule* adm,
+    rtc::Thread* thread);
+
+RTC_EXPORT void webrtcAudioDeviceModuleStopRecording(
+    WebrtcAudioDeviceModule* adm,
+    rtc::Thread* thread);
+
+RTC_EXPORT void webrtcAudioDeviceModuleStartRecording(
+    WebrtcAudioDeviceModule* adm,
+    rtc::Thread* thread);
+
 RTC_EXPORT int32_t
 webrtcAudioDeviceModuleSetPlayoutDevice(WebrtcAudioDeviceModule* adm,
                                         uint16_t index);

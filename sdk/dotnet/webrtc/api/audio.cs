@@ -27,6 +27,8 @@ namespace Pixiv.Webrtc
     {
         public IntPtr Ptr { get; private set; }
 
+        private IThread thread;
+
         private const int kAdmMaxDeviceNameSize = 128;
         private const int kAdmMaxGuidSize = 128;
 
@@ -35,6 +37,24 @@ namespace Pixiv.Webrtc
 
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
         private static extern Int16 webrtcAudioDeviceModuleRecordingDevices(IntPtr adm);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void webrtcAudioDeviceModuleInitPlayout(IntPtr adm, IntPtr rtcthread);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void webrtcAudioDeviceModuleInitRecording(IntPtr adm, IntPtr rtcthread);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void webrtcAudioDeviceModuleStartPlayout(IntPtr adm, IntPtr rtcthread);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void webrtcAudioDeviceModuleStopPlayout(IntPtr adm, IntPtr rtcthread);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void webrtcAudioDeviceModuleStartRecording(IntPtr adm, IntPtr rtcthread);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void webrtcAudioDeviceModuleStopRecording(IntPtr adm, IntPtr rtcthread);
 
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
         private static extern Int32 webrtcAudioDeviceModuleSetPlayoutDevice(IntPtr adm, UInt16 index);
@@ -57,9 +77,10 @@ namespace Pixiv.Webrtc
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
         private static extern void webrtcAudioDeviceModuleSetSpeakerVolume(IntPtr adm, float volume);
 
-        public AudioDeviceModule(IntPtr ptr)
+        public AudioDeviceModule(IntPtr ptr, IThread thread)
         {
             this.Ptr = ptr;
+            this.thread = thread;
         }
 
         public Int32 PlayoutDevices()
@@ -80,6 +101,36 @@ namespace Pixiv.Webrtc
         public Int32 SetRecordingDevice(UInt16 index)
         {
             return webrtcAudioDeviceModuleSetRecordingDevice(Ptr, index);
+        }
+
+        public void StartPlayout()
+        {
+            webrtcAudioDeviceModuleStartPlayout(Ptr, thread.Ptr);
+        }
+
+        public void InitPlayout()
+        {
+            webrtcAudioDeviceModuleInitPlayout(Ptr, thread.Ptr);
+        }
+
+        public void InitRecording()
+        {
+            webrtcAudioDeviceModuleInitRecording(Ptr, thread.Ptr);
+        }
+
+        public void StopPlayout()
+        {
+            webrtcAudioDeviceModuleStopPlayout(Ptr, thread.Ptr);
+        }
+
+        public void StartRecording()
+        {
+            webrtcAudioDeviceModuleStartRecording(Ptr, thread.Ptr);
+        }
+
+        public void StopRecording()
+        {
+            webrtcAudioDeviceModuleStopRecording(Ptr, thread.Ptr);
         }
 
         public void SetSpeakerVolume(float volume)
@@ -135,7 +186,7 @@ namespace Pixiv.Webrtc
 
         public static AudioDeviceModule CreateDefault(IThread thread)
         {
-            return new AudioDeviceModule(webrtcCreateDefaultAudioDeviceModule(thread.Ptr));
+            return new AudioDeviceModule(webrtcCreateDefaultAudioDeviceModule(thread.Ptr), thread);
         }
     }
 }
