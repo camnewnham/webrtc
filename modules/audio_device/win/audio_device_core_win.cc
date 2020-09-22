@@ -428,8 +428,8 @@ AudioDeviceWindowsCore::AudioDeviceWindowsCore()
       _microphoneIsInitialized(false),
       _usingInputDeviceIndex(false),
       _usingOutputDeviceIndex(false),
-      _inputDevice(AudioDeviceModule::kDefaultCommunicationDevice),
-      _outputDevice(AudioDeviceModule::kDefaultCommunicationDevice),
+      _inputDevice(AudioDeviceModule::kDefaultDevice),
+      _outputDevice(AudioDeviceModule::kDefaultDevice),
       _inputDeviceIndex(0),
       _outputDeviceIndex(0) {
   RTC_LOG(LS_INFO) << __FUNCTION__ << " created";
