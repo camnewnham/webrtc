@@ -11,6 +11,7 @@
 #ifndef SDK_OBJC_NATIVE_SRC_AUDIO_AUDIO_DEVICE_IOS_H_
 #define SDK_OBJC_NATIVE_SRC_AUDIO_AUDIO_DEVICE_IOS_H_
 
+#include <CoreMedia/CoreMedia.h>
 #include <memory>
 
 #include "audio_session_observer.h"
@@ -146,6 +147,8 @@ class AudioDeviceIOS : public AudioDeviceGeneric,
   void OnCanPlayOrRecordChange(bool can_play_or_record) override;
   void OnChangedOutputVolume() override;
 
+  void OnDeliverRecordedExternalData(CMSampleBufferRef sample_buffer);
+
   // VoiceProcessingAudioUnitObserver methods.
   OSStatus OnDeliverRecordedData(AudioUnitRenderActionFlags* flags,
                                  const AudioTimeStamp* time_stamp,
@@ -162,6 +165,8 @@ class AudioDeviceIOS : public AudioDeviceGeneric,
   void OnMessage(rtc::Message* msg) override;
 
   bool IsInterrupted();
+
+  OSType audio_unit_sub_type;
 
  private:
   // Called by the relevant AudioSessionObserver methods on |thread_|.
@@ -209,8 +214,8 @@ class AudioDeviceIOS : public AudioDeviceGeneric,
   // created on.
   rtc::ThreadChecker thread_checker_;
 
-  // Native I/O audio thread checker.
-  rtc::ThreadChecker io_thread_checker_;
+  // Native audio I/O critical section.
+  rtc::CriticalSection io_lock_;
 
   // Thread that this object is created on.
   rtc::Thread* thread_;
@@ -283,7 +288,7 @@ class AudioDeviceIOS : public AudioDeviceGeneric,
 
   // Counts number of detected audio glitches on the playout side.
   int64_t num_detected_playout_glitches_ RTC_GUARDED_BY(thread_checker_);
-  int64_t last_playout_time_ RTC_GUARDED_BY(io_thread_checker_);
+  int64_t last_playout_time_ RTC_GUARDED_BY(io_lock_);
 
   // Counts number of playout callbacks per call.
   // The value isupdated on the native I/O thread and later read on the

@@ -390,8 +390,8 @@ AudioDeviceWindowsCore::AudioDeviceWindowsCore()
       _microphoneIsInitialized(false),
       _usingInputDeviceIndex(false),
       _usingOutputDeviceIndex(false),
-      _inputDevice(AudioDeviceModule::kDefaultCommunicationDevice),
-      _outputDevice(AudioDeviceModule::kDefaultCommunicationDevice),
+      _inputDevice(AudioDeviceModule::kDefaultDevice),
+      _outputDevice(AudioDeviceModule::kDefaultDevice),
       _inputDeviceIndex(0),
       _outputDeviceIndex(0) {
   RTC_LOG(LS_INFO) << __FUNCTION__ << " created";
@@ -2593,7 +2593,8 @@ int32_t AudioDeviceWindowsCore::PlayoutDelay(uint16_t& delayMS) const {
 }
 
 bool AudioDeviceWindowsCore::BuiltInAECIsAvailable() const {
-  return _dmo != nullptr;
+  return false; // disable in-built AEC on Windows because this will soon be
+  //deprecated, and it also inteferes with one-way audio (ISSUE #6)
 }
 
 // ----------------------------------------------------------------------------

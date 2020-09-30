@@ -20,6 +20,10 @@
 #include "modules/audio_device/include/audio_device.h"
 #include "rtc_base/checks.h"
 
+#if defined(WEBRTC_IOS)
+#include <CoreMedia/CoreMedia.h>
+#endif
+
 namespace webrtc {
 
 class AudioDeviceGeneric;
@@ -127,6 +131,9 @@ class AudioDeviceModuleIOS : public AudioDeviceModule {
   int32_t GetPlayoutUnderrunCount() const override;
 
 #if defined(WEBRTC_IOS)
+  void OnDeliverRecordedExternalData(CMSampleBufferRef sample_buffer);
+  OSType GetAudioUnitSubType() const;
+  void SetAudioUnitSubType(OSType sub_type);
   int GetPlayoutAudioParameters(AudioParameters* params) const override;
   int GetRecordAudioParameters(AudioParameters* params) const override;
 #endif  // WEBRTC_IOS
@@ -135,6 +142,10 @@ class AudioDeviceModuleIOS : public AudioDeviceModule {
   const std::unique_ptr<TaskQueueFactory> task_queue_factory_;
   std::unique_ptr<AudioDeviceIOS> audio_device_;
   std::unique_ptr<AudioDeviceBuffer> audio_device_buffer_;
+
+#if defined(WEBRTC_IOS)
+  OSType audio_unit_sub_type_ = kAudioUnitSubType_VoiceProcessingIO;
+#endif // WEBRTC_IOS
 };
 }  // namespace ios_adm
 }  // namespace webrtc
