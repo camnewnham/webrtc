@@ -52,10 +52,6 @@ namespace Pixiv.Rtc
         void ReleasePtr();
     }
 
-    public interface IDisposableMessageQueue : IDisposable, IMessageQueue
-    {
-    }
-
     public interface IDisposableRtcCertificateGeneratorInterface :
         IDisposable, IRtcCertificateGeneratorInterface
     {
@@ -66,13 +62,8 @@ namespace Pixiv.Rtc
     {
     }
 
-    public interface IDisposableThread : IDisposableMessageQueue, IThread
+    public interface IDisposableThread : IDisposable, IThread
     {
-    }
-
-    public interface IMessageQueue
-    {
-        IntPtr Ptr { get; }
     }
 
     public interface IRtcCertificate
@@ -90,9 +81,9 @@ namespace Pixiv.Rtc
         IntPtr Ptr { get; }
     }
 
-    public interface IThread : IMessageQueue
+    public interface IThread
     {
-        new IntPtr Ptr { get; }
+        IntPtr Ptr { get; }
     }
 
     public interface IThreadManager
@@ -156,9 +147,6 @@ namespace Pixiv.Rtc
 
     public sealed class DisposableThread : DisposablePtr, IDisposableThread
     {
-        IntPtr IMessageQueue.Ptr =>
-            Interop.Thread.ToRtcMessageQueue(((IThread)this).Ptr);
-
         IntPtr IThread.Ptr => Ptr;
 
         public DisposableThread(IntPtr ptr)
@@ -168,15 +156,11 @@ namespace Pixiv.Rtc
 
         private protected override void FreePtr()
         {
-            Interop.MessageQueue.Delete(Interop.Thread.ToRtcMessageQueue(Ptr));
         }
     }
 
     public sealed class Thread : IThread
     {
-        IntPtr IMessageQueue.Ptr =>
-            Interop.Thread.ToRtcMessageQueue(((IThread)this).Ptr);
-
         IntPtr IThread.Ptr => _ptr;
 
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
@@ -211,23 +195,6 @@ namespace Pixiv.Rtc
             new ThreadManager(rtcThreadManagerInstance());
     }
 
-    public static class MessageQueueExtension
-    {
-        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void rtcMessageQueueQuit(IntPtr ptr);
-
-        public static void Quit(this IMessageQueue queue)
-        {
-            if (queue == null)
-            {
-                throw new ArgumentNullException(nameof(queue));
-            }
-
-            rtcMessageQueueQuit(queue.Ptr);
-            GC.KeepAlive(queue);
-        }
-    }
-
     public static class ThreadExtension
     {
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
@@ -235,6 +202,9 @@ namespace Pixiv.Rtc
 
         [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
         private static extern void rtcThreadStart(IntPtr ptr);
+
+        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void rtcThreadQuit(IntPtr ptr);
 
         public static void Run(this IThread thread)
         {
@@ -255,6 +225,17 @@ namespace Pixiv.Rtc
             }
 
             rtcThreadStart(thread.Ptr);
+            GC.KeepAlive(thread);
+        }
+
+        public static void Quit(this IThread thread)
+        {
+            if (thread == null)
+            {
+                throw new ArgumentNullException(nameof(thread));
+            }
+
+            rtcThreadQuit(thread.Ptr);
             GC.KeepAlive(thread);
         }
     }
@@ -294,23 +275,5 @@ namespace Pixiv.Rtc
 
             return new Thread(thread);
         }
-    }
-}
-
-namespace Pixiv.Rtc.Interop
-{
-    public static class MessageQueue
-    {
-        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl, EntryPoint = "rtcDeleteMessageQueue")]
-        public static extern void Delete(IntPtr ptr);
-    }
-
-    public static class Thread
-    {
-        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl, EntryPoint = "rtcMessageQueueToRtcThread")]
-        public static extern IntPtr FromMessageQueue(IntPtr ptr);
-
-        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl, EntryPoint = "rtcThreadToRtcMessageQueue")]
-        public static extern IntPtr ToRtcMessageQueue(IntPtr ptr);
     }
 }

@@ -6,7 +6,7 @@
  */
 
 #include "api/video/video_buffer.h"
-#include "rtc_base/critical_section.h"
+#include "rtc_base/deprecated/recursive_critical_section.h"
 
 namespace webrtc {
 

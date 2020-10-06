@@ -88,6 +88,9 @@ if (!build_with_chromium) {
         ]
       }
     }
+    if (rtc_enable_symbol_export && !is_android) {
+      deps += [ ":jingle_peerconnection_so" ]
+    }
   }
 }
 
@@ -709,6 +712,16 @@ if (rtc_include_tests) {
       "audio/voip/test:audio_ingress_unittests",
       "audio/voip/test:voip_core_unittests",
       "test:test_main",
+    ]
+  }
+}
+
+if (!is_android) {
+  rtc_shared_library("jingle_peerconnection_so") {
+    deps = [
+      "sdk/c",
+      "pc:libjingle_peerconnection",
+      "rtc_base",
     ]
   }
 }

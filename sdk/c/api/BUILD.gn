@@ -66,6 +66,7 @@ rtc_source_set("video_codecs") {
 }
 
 rtc_source_set("create_turn_server") {
+  testonly = true
   sources = [
     "create_turn_server.cc",
     "create_turn_server.h",

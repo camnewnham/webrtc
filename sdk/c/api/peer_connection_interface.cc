@@ -450,12 +450,12 @@ class webrtcAudioDeviceModuleFactory {
 extern "C" WebrtcAudioDeviceModule* webrtcCreateDefaultAudioDeviceModule(rtc::Thread* thread) {
   webrtcAudioDeviceModuleFactory* factory =
       new webrtcAudioDeviceModuleFactory();
-    webrtc::MethodCall0< webrtcAudioDeviceModuleFactory,
+    webrtc::MethodCall< webrtcAudioDeviceModuleFactory,
       rtc::scoped_refptr<webrtc::AudioDeviceModule>> call(
           factory, &webrtcAudioDeviceModuleFactory::createAudioDeviceModule);
   auto r = call.Marshal(RTC_FROM_HERE, thread); 
-  return rtc::ToC(r.release());
   delete factory;
+  return rtc::ToC(r.release());
 }
 
 extern "C" uint16_t webrtcAudioDeviceModulePlayoutDevices(
@@ -471,35 +471,35 @@ extern "C" uint16_t webrtcAudioDeviceModuleRecordingDevices(
 extern "C" void webrtcAudioDeviceModuleInitPlayout(
     WebrtcAudioDeviceModule* adm,
     rtc::Thread* thread) {
-  webrtc::MethodCall0<webrtc::AudioDeviceModule, int32_t> call(
+  webrtc::MethodCall<webrtc::AudioDeviceModule, int32_t> call(
       rtc::ToCplusplus(adm), &webrtc::AudioDeviceModule::InitPlayout);
   call.Marshal(RTC_FROM_HERE, thread);
 }
 
 extern "C" void webrtcAudioDeviceModuleStartPlayout(
     WebrtcAudioDeviceModule* adm, rtc::Thread* thread) {
-  webrtc::MethodCall0<webrtc::AudioDeviceModule, int32_t> call(
+  webrtc::MethodCall<webrtc::AudioDeviceModule, int32_t> call(
           rtc::ToCplusplus(adm), &webrtc::AudioDeviceModule::StartPlayout);
   call.Marshal(RTC_FROM_HERE, thread);
 }
 
 extern "C" void webrtcAudioDeviceModuleStopPlayout(
     WebrtcAudioDeviceModule* adm, rtc::Thread* thread) {
-  webrtc::MethodCall0<webrtc::AudioDeviceModule, int32_t> call(
+  webrtc::MethodCall<webrtc::AudioDeviceModule, int32_t> call(
           rtc::ToCplusplus(adm), &webrtc::AudioDeviceModule::StopPlayout);
   call.Marshal(RTC_FROM_HERE, thread);
 }
 
 extern "C" void webrtcAudioDeviceModuleInitRecording(WebrtcAudioDeviceModule* adm,
                                                    rtc::Thread* thread) {
-  webrtc::MethodCall0<webrtc::AudioDeviceModule, int32_t> call(
+  webrtc::MethodCall<webrtc::AudioDeviceModule, int32_t> call(
       rtc::ToCplusplus(adm), &webrtc::AudioDeviceModule::InitRecording);
   call.Marshal(RTC_FROM_HERE, thread);
 }
 
 extern "C" void webrtcAudioDeviceModuleStopRecording(WebrtcAudioDeviceModule* adm,
                                                    rtc::Thread* thread) {
-  webrtc::MethodCall0<webrtc::AudioDeviceModule, int32_t> call(
+  webrtc::MethodCall<webrtc::AudioDeviceModule, int32_t> call(
       rtc::ToCplusplus(adm), &webrtc::AudioDeviceModule::StopRecording);
   call.Marshal(RTC_FROM_HERE, thread);
 }
@@ -507,7 +507,7 @@ extern "C" void webrtcAudioDeviceModuleStopRecording(WebrtcAudioDeviceModule* ad
 extern "C" void webrtcAudioDeviceModuleStartRecording(
     WebrtcAudioDeviceModule* adm,
                                                    rtc::Thread* thread) {
-  webrtc::MethodCall0<webrtc::AudioDeviceModule, int32_t> call(
+  webrtc::MethodCall<webrtc::AudioDeviceModule, int32_t> call(
       rtc::ToCplusplus(adm), &webrtc::AudioDeviceModule::StartRecording);
   call.Marshal(RTC_FROM_HERE, thread);
 }
