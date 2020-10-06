@@ -300,7 +300,7 @@ class AudioDeviceWindowsCore : public AudioDeviceGeneric {
   uint32_t _recBlockSize;
   uint32_t _recChannels;
 
-  uint16_t _recChannelsPrioList[3];
+  uint16_t _recChannelsPrioList[2];
   uint16_t _playChannelsPrioList[2];
 
   LARGE_INTEGER _perfCounterFreq;

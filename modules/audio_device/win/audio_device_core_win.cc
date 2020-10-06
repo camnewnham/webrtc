@@ -451,7 +451,7 @@ AudioDeviceWindowsCore::AudioDeviceWindowsCore()
   // list of number of channels to use on recording side
   _recChannelsPrioList[0] = 2;  // stereo is prio 1
   _recChannelsPrioList[1] = 1;  // mono is prio 2
-  _recChannelsPrioList[2] = 4;  // quad is prio 3
+
 
   // list of number of channels to use on playout side
   _playChannelsPrioList[0] = 2;  // stereo is prio 1
