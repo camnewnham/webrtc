@@ -288,11 +288,9 @@ rtclog2::IceCandidatePairEvent::IceCandidatePairEventType ConvertToProtoFormat(
 }
 
 // Copies all RTCP blocks except APP, SDES and unknown from |packet| to
-// |buffer|. |buffer| must have space for |IP_PACKET_SIZE| bytes. |packet| must
-// be at most |IP_PACKET_SIZE| bytes long.
+// |buffer|. |buffer| must have space for at least |packet.size()| bytes.
 size_t RemoveNonWhitelistedRtcpBlocks(const rtc::Buffer& packet,
                                       uint8_t* buffer) {
-  RTC_DCHECK(packet.size() <= IP_PACKET_SIZE);
   RTC_DCHECK(buffer != nullptr);
   rtcp::CommonHeader header;
   const uint8_t* block_begin = packet.data();
@@ -346,10 +344,10 @@ void EncodeRtcpPacket(rtc::ArrayView<const EventType*> batch,
   const EventType* const base_event = batch[0];
   proto_batch->set_timestamp_ms(base_event->timestamp_ms());
   {
-    uint8_t buffer[IP_PACKET_SIZE];
+    std::vector<uint8_t> buffer(base_event->packet().size());
     size_t buffer_length =
-        RemoveNonWhitelistedRtcpBlocks(base_event->packet(), buffer);
-    proto_batch->set_raw_packet(buffer, buffer_length);
+        RemoveNonWhitelistedRtcpBlocks(base_event->packet(), buffer.data());
+    proto_batch->set_raw_packet(buffer.data(), buffer_length);
   }
 
   if (batch.size() == 1) {
@@ -1409,7 +1407,7 @@ void RtcEventLogEncoderNewFormat::EncodeRemoteEstimate(
   // link_capacity_lower_kbps
   for (size_t i = 0; i < values.size(); ++i) {
     const auto* event = batch[i + 1];
-    if (base_event->link_capacity_lower_.IsFinite()) {
+    if (event->link_capacity_lower_.IsFinite()) {
       values[i] = event->link_capacity_lower_.kbps<uint32_t>();
     } else {
       values[i].reset();
@@ -1423,7 +1421,7 @@ void RtcEventLogEncoderNewFormat::EncodeRemoteEstimate(
   // link_capacity_upper_kbps
   for (size_t i = 0; i < values.size(); ++i) {
     const auto* event = batch[i + 1];
-    if (base_event->link_capacity_upper_.IsFinite()) {
+    if (event->link_capacity_upper_.IsFinite()) {
       values[i] = event->link_capacity_upper_.kbps<uint32_t>();
     } else {
       values[i].reset();

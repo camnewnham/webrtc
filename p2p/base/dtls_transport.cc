@@ -23,6 +23,7 @@
 #include "rtc_base/checks.h"
 #include "rtc_base/dscp.h"
 #include "rtc_base/logging.h"
+#include "rtc_base/robo_caller.h"
 #include "rtc_base/rtc_certificate.h"
 #include "rtc_base/ssl_stream_adapter.h"
 #include "rtc_base/stream.h"
@@ -73,6 +74,8 @@ rtc::StreamResult StreamInterfaceChannel::Read(void* buffer,
                                                size_t buffer_len,
                                                size_t* read,
                                                int* error) {
+  RTC_DCHECK_RUN_ON(&sequence_checker_);
+
   if (state_ == rtc::SS_CLOSED)
     return rtc::SR_EOS;
   if (state_ == rtc::SS_OPENING)
@@ -89,6 +92,7 @@ rtc::StreamResult StreamInterfaceChannel::Write(const void* data,
                                                 size_t data_len,
                                                 size_t* written,
                                                 int* error) {
+  RTC_DCHECK_RUN_ON(&sequence_checker_);
   // Always succeeds, since this is an unreliable transport anyway.
   // TODO(zhihuang): Should this block if ice_transport_'s temporarily
   // unwritable?
@@ -102,6 +106,7 @@ rtc::StreamResult StreamInterfaceChannel::Write(const void* data,
 }
 
 bool StreamInterfaceChannel::OnPacketReceived(const char* data, size_t size) {
+  RTC_DCHECK_RUN_ON(&sequence_checker_);
   if (packets_.size() > 0) {
     RTC_LOG(LS_WARNING) << "Packet already in queue.";
   }
@@ -118,10 +123,12 @@ bool StreamInterfaceChannel::OnPacketReceived(const char* data, size_t size) {
 }
 
 rtc::StreamState StreamInterfaceChannel::GetState() const {
+  RTC_DCHECK_RUN_ON(&sequence_checker_);
   return state_;
 }
 
 void StreamInterfaceChannel::Close() {
+  RTC_DCHECK_RUN_ON(&sequence_checker_);
   packets_.Clear();
   state_ = rtc::SS_CLOSED;
 }
@@ -352,8 +359,8 @@ bool DtlsTransport::SetupDtls() {
   dtls_->SetMaxProtocolVersion(ssl_max_version_);
   dtls_->SetServerRole(*dtls_role_);
   dtls_->SignalEvent.connect(this, &DtlsTransport::OnDtlsEvent);
-  dtls_->SignalSSLHandshakeError.connect(this,
-                                         &DtlsTransport::OnDtlsHandshakeError);
+  dtls_->SignalSSLHandshakeError.AddReceiver(
+      [this](rtc::SSLHandshakeError e) { OnDtlsHandshakeError(e); });
   if (remote_fingerprint_value_.size() &&
       !dtls_->SetPeerCertificateDigest(
           remote_fingerprint_algorithm_,
@@ -814,7 +821,7 @@ void DtlsTransport::set_dtls_state(DtlsTransportState state) {
 }
 
 void DtlsTransport::OnDtlsHandshakeError(rtc::SSLHandshakeError error) {
-  SignalDtlsHandshakeError(error);
+  SignalDtlsHandshakeError.Send(error);
 }
 
 void DtlsTransport::ConfigureHandshakeTimeout() {

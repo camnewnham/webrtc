@@ -2936,10 +2936,9 @@ TEST_F(VideoSendStreamTest, ReconfigureBitratesSetsEncoderBitratesCorrectly) {
   static const int kIncreasedStartBitrateKbps = 451;
   static const int kIncreasedMaxBitrateKbps = 597;
   // If these fields trial are on, we get lower bitrates than expected by this
-  // test, due to the packetization overhead and encoder pushback.
+  // test, due to encoder pushback.
   webrtc::test::ScopedFieldTrials field_trials(
       std::string(field_trial::GetFieldTrialString()) +
-      "WebRTC-SubtractPacketizationOverhead/Disabled/"
       "WebRTC-VideoRateControl/bitrate_adjuster:false/");
 
   class EncoderBitrateThresholdObserver : public test::SendTest,
@@ -3150,8 +3149,10 @@ TEST_F(VideoSendStreamTest, ReportsSentResolution) {
       CodecSpecificInfo specifics;
       specifics.codecType = kVideoCodecGeneric;
 
-      uint8_t buffer[16] = {0};
-      EncodedImage encoded(buffer, sizeof(buffer), sizeof(buffer));
+      EncodedImage encoded;
+      auto buffer = EncodedImageBuffer::Create(16);
+      memset(buffer->data(), 0, 16);
+      encoded.SetEncodedData(buffer);
       encoded.SetTimestamp(input_image.timestamp());
       encoded.capture_time_ms_ = input_image.render_time_ms();
 

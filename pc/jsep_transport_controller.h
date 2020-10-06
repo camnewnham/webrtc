@@ -35,6 +35,7 @@
 #include "rtc_base/async_invoker.h"
 #include "rtc_base/constructor_magic.h"
 #include "rtc_base/ref_counted_object.h"
+#include "rtc_base/robo_caller.h"
 #include "rtc_base/third_party/sigslot/sigslot.h"
 
 namespace rtc {
@@ -101,7 +102,7 @@ class JsepTransportController : public sigslot::has_slots<> {
     RtcEventLog* event_log = nullptr;
 
     // Factory for SCTP transports.
-    cricket::SctpTransportInternalFactory* sctp_factory = nullptr;
+    SctpTransportFactoryInterface* sctp_factory = nullptr;
   };
 
   // The ICE related events are signaled on the |signaling_thread|.
@@ -197,32 +198,31 @@ class JsepTransportController : public sigslot::has_slots<> {
   // Else if all completed => completed,
   // Else if all connected => connected,
   // Else => connecting
-  sigslot::signal1<cricket::IceConnectionState> SignalIceConnectionState;
+  RoboCaller<cricket::IceConnectionState> SignalIceConnectionState;
 
-  sigslot::signal1<PeerConnectionInterface::PeerConnectionState>
+  RoboCaller<PeerConnectionInterface::PeerConnectionState>
       SignalConnectionState;
-  sigslot::signal1<PeerConnectionInterface::IceConnectionState>
+
+  RoboCaller<PeerConnectionInterface::IceConnectionState>
       SignalStandardizedIceConnectionState;
 
   // If all transports done gathering => complete,
   // Else if any are gathering => gathering,
   // Else => new
-  sigslot::signal1<cricket::IceGatheringState> SignalIceGatheringState;
+  RoboCaller<cricket::IceGatheringState> SignalIceGatheringState;
 
-  // (mid, candidates)
-  sigslot::signal2<const std::string&, const std::vector<cricket::Candidate>&>
+  // [mid, candidates]
+  RoboCaller<const std::string&, const std::vector<cricket::Candidate>&>
       SignalIceCandidatesGathered;
 
-  sigslot::signal1<const cricket::IceCandidateErrorEvent&>
-      SignalIceCandidateError;
+  RoboCaller<const cricket::IceCandidateErrorEvent&> SignalIceCandidateError;
 
-  sigslot::signal1<const std::vector<cricket::Candidate>&>
-      SignalIceCandidatesRemoved;
+  RoboCaller<const std::vector<cricket::Candidate>&> SignalIceCandidatesRemoved;
 
-  sigslot::signal1<const cricket::CandidatePairChangeEvent&>
+  RoboCaller<const cricket::CandidatePairChangeEvent&>
       SignalIceCandidatePairChanged;
 
-  sigslot::signal1<rtc::SSLHandshakeError> SignalDtlsHandshakeError;
+  RoboCaller<rtc::SSLHandshakeError> SignalDtlsHandshakeError;
 
  private:
   RTCError ApplyDescription_n(bool local,

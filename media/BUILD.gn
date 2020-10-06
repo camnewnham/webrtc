@@ -88,11 +88,13 @@ rtc_library("rtc_media_base") {
     "../api:rtc_error",
     "../api:rtp_parameters",
     "../api:scoped_refptr",
+    "../api/audio:audio_frame_processor",
     "../api/audio_codecs:audio_codecs_api",
     "../api/crypto:frame_decryptor_interface",
     "../api/crypto:frame_encryptor_interface",
     "../api/crypto:options",
     "../api/transport:stun_types",
+    "../api/transport:webrtc_key_value_config",
     "../api/transport/rtp:rtp_source",
     "../api/video:video_bitrate_allocation",
     "../api/video:video_bitrate_allocator_factory",
@@ -103,6 +105,7 @@ rtc_library("rtc_media_base") {
     "../call:call_interfaces",
     "../call:video_stream_api",
     "../common_video",
+    "../modules/async_audio_processing",
     "../modules/audio_processing:audio_processing_statistics",
     "../modules/rtp_rtcp:rtp_rtcp_format",
     "../rtc_base",
@@ -193,6 +196,7 @@ rtc_library("rtc_simulcast_encoder_adapter") {
     "../rtc_base:rtc_base_approved",
     "../rtc_base/experiments:rate_control_settings",
     "../rtc_base/synchronization:sequence_checker",
+    "../rtc_base/system:no_unique_address",
     "../rtc_base/system:rtc_export",
     "../system_wrappers",
     "../system_wrappers:field_trial",
@@ -283,10 +287,13 @@ rtc_library("rtc_audio_video") {
     "../api:rtp_parameters",
     "../api:scoped_refptr",
     "../api:transport_api",
+    "../api/audio:audio_frame_processor",
     "../api/audio:audio_mixer_api",
     "../api/audio_codecs:audio_codecs_api",
     "../api/task_queue",
     "../api/transport:bitrate_settings",
+    "../api/transport:field_trial_based_config",
+    "../api/transport:webrtc_key_value_config",
     "../api/transport/rtp:rtp_source",
     "../api/units:data_rate",
     "../api/video:video_bitrate_allocation",
@@ -301,6 +308,7 @@ rtc_library("rtc_audio_video") {
     "../call:call_interfaces",
     "../call:video_stream_api",
     "../common_video",
+    "../modules/async_audio_processing:async_audio_processing",
     "../modules/audio_device",
     "../modules/audio_device:audio_device_impl",
     "../modules/audio_mixer:audio_mixer_impl",
@@ -324,7 +332,6 @@ rtc_library("rtc_audio_video") {
     "../rtc_base/system:rtc_export",
     "../rtc_base/third_party/base64",
     "../system_wrappers",
-    "../system_wrappers:field_trial",
     "../system_wrappers:metrics",
   ]
   absl_deps = [
@@ -426,7 +433,10 @@ rtc_library("rtc_data") {
   }
 
   if (rtc_enable_sctp && rtc_build_usrsctp) {
-    deps += [ "//third_party/usrsctp" ]
+    deps += [
+      "../api/transport:sctp_transport_factory_interface",
+      "//third_party/usrsctp",
+    ]
   }
 }
 
@@ -453,6 +463,7 @@ if (rtc_include_tests) {
       "../api:call_api",
       "../api:fec_controller_api",
       "../api:scoped_refptr",
+      "../api/transport:field_trial_based_config",
       "../api/video:encoded_image",
       "../api/video:video_bitrate_allocation",
       "../api/video:video_frame",
