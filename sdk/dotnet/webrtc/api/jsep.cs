@@ -15,7 +15,8 @@ namespace Pixiv.Webrtc
     {
         Offer,
         PrAnswer,
-        Answer
+        Answer,
+        Rollback
     }
 
     public interface ICreateSessionDescriptionObserver
