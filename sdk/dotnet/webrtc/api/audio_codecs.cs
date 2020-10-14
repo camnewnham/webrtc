@@ -61,9 +61,6 @@ namespace Pixiv.Webrtc
     {
         IntPtr IAudioDecoderFactory.Ptr => Ptr;
 
-        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr webrtcCreateBuiltinAudioDecoderFactory();
-
         public DisposableAudioDecoderFactory(IntPtr ptr)
         {
             Ptr = ptr;
@@ -79,9 +76,6 @@ namespace Pixiv.Webrtc
         Rtc.DisposablePtr, IDisposableAudioEncoderFactory
     {
         IntPtr IAudioEncoderFactory.Ptr => Ptr;
-
-        [DllImport(Dll.Name, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr webrtcCreateBuiltinAudioEncoderFactory();
 
         public DisposableAudioEncoderFactory(IntPtr ptr)
         {
