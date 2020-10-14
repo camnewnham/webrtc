@@ -143,6 +143,11 @@ namespace Pixiv.Rtc
             _ptr = IntPtr.Zero;
             GC.SuppressFinalize(this);
         }
+
+        ~DisposablePtr()
+        {
+            // Magic finaliser to shut Unity up. See: https://github.com/sebjf/webrtc/issues/9
+        }
     }
 
     public sealed class DisposableThread : DisposablePtr, IDisposableThread
