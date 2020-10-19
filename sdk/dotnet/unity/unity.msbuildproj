@@ -31,7 +31,7 @@
     <Target Name="Build" DependsOnTargets="BuildAndroid;BuildIos;BuildLinuxX64;BuildMacX64;BuildWinX64;Json2Licenses">
         <Copy
             DestinationFolder="$(OutputPath)"
-            SourceFiles="$(SourceRootPath)PATENTS;$(SourceRootPath)README.md;$(MSBuildThisFileDirectory)LICENSE.md.meta;$(MSBuildThisFileDirectory)PATENTS.meta;$(MSBuildThisFileDirectory)README.md.meta;$(MSBuildThisFileDirectory)Runtime.meta;$(MSBuildThisFileDirectory)package.json;$(MSBuildThisFileDirectory)package.json.meta" />
+            SourceFiles="$(SourceRootPath)PATENTS;$(SourceRootPath)README.md;$(MSBuildThisFileDirectory)LICENSE.md.meta;$(MSBuildThisFileDirectory)PATENTS.meta;$(MSBuildThisFileDirectory)README.md.meta" />
     </Target>
     <Target Name="Json2Licenses" DependsOnTargets="BuildAndroid;BuildIos;BuildLinuxX64;BuildMacX64;BuildWinX64">
         <ItemGroup>
@@ -61,9 +61,9 @@
             <Output TaskParameter="AbsolutePaths" PropertyName="AbsoluteOutputPath" />
         </ConvertToAbsolutePath>
         <Exec
-            Command="./tools_webrtc/android/build_aar.py --build-dir $(AbsoluteIntermediateOutputPath.Replace('\', '\\').Replace('&quot;', '\&quot;'))build/android --output $(AbsoluteOutputPath.Replace('\', '\\').Replace('&quot;', '\&quot;'))Runtime/libwebrtc.aar --arch armeabi-v7a arm64-v8a --extra-gn-args is_debug=$(IsDebug) rtc_enable_symbol_export=true"
+            Command="./tools_webrtc/android/build_aar.py --build-dir $(AbsoluteIntermediateOutputPath.Replace('\', '\\').Replace('&quot;', '\&quot;'))build/android --output $(AbsoluteOutputPath.Replace('\', '\\').Replace('&quot;', '\&quot;'))libwebrtc.aar --arch armeabi-v7a arm64-v8a --extra-gn-args is_debug=$(IsDebug) rtc_enable_symbol_export=true"
             WorkingDirectory="$(SourceRootPath)" />
-        <Delete Files="$(OutputPath)/Runtime/LICENSE.md" />
+        <Delete Files="$(OutputPath)/LICENSE.md" />
         <MakeDir Directories="$(IntermediateOutputPath)desc/android/armeabi-v7a;$(IntermediateOutputPath)desc/android/arm64-v8a" />
         <Exec Command="gn desc --all --format=json $(EscapedIntermediateOutputPath)build/android/armeabi-v7a //sdk/android:libwebrtc > $(EscapedIntermediateOutputPath)desc/android/armeabi-v7a/libwebrtc.json" />
         <Exec Command="gn desc --all --format=json $(EscapedIntermediateOutputPath)build/android/armeabi-v7a //sdk/android:libjingle_peerconnection_so > $(EscapedIntermediateOutputPath)desc/android/armeabi-v7a/libjingle_peerconnection_so.json" />
@@ -80,11 +80,10 @@
         <ConvertToAbsolutePath Paths="$(OutputPath)">
             <Output TaskParameter="AbsolutePaths" PropertyName="AbsoluteOutputPath" />
         </ConvertToAbsolutePath>
-        <Copy DestinationFolder="$(OutputPath)Runtime" SourceFiles="$(MSBuildThisFileDirectory)Runtime/external.meta" />
-        <Copy DestinationFolder="$(OutputPath)Runtime/external" SourceFiles="$(MSBuildThisFileDirectory)Runtime/external/webrtc.deps.json.meta;$(MSBuildThisFileDirectory)Runtime/external/webrtc.dll.meta;$(MSBuildThisFileDirectory)Runtime/external/webrtc.pdb.meta" />
+        <Copy DestinationFolder="$(OutputPath)" SourceFiles="$(MSBuildThisFileDirectory)Runtime/external/webrtc.deps.json.meta;$(MSBuildThisFileDirectory)Runtime/external/webrtc.dll.meta;$(MSBuildThisFileDirectory)Runtime/external/webrtc.pdb.meta" />
         <MSBuild
             Projects="../webrtc/webrtc.csproj"
-            Properties="AppendTargetFrameworkToOutputPath=false;BaseIntermediateOutputPath=$(AbsoluteBaseIntermediateOutputPath);IntermediateOutputPath=$(AbsoluteIntermediateOutputPath)external/;OutputPath=$(AbsoluteOutputPath)Runtime/external/"
+            Properties="AppendTargetFrameworkToOutputPath=false;BaseIntermediateOutputPath=$(AbsoluteBaseIntermediateOutputPath);IntermediateOutputPath=$(AbsoluteIntermediateOutputPath);OutputPath=$(AbsoluteOutputPath)/"
             Targets="Build" />
     </Target>
     <Target Name="BuildInternal">
@@ -97,11 +96,11 @@
         <ConvertToAbsolutePath Paths="$(OutputPath)">
             <Output TaskParameter="AbsolutePaths" PropertyName="AbsoluteOutputPath" />
         </ConvertToAbsolutePath>
-        <Copy DestinationFolder="$(OutputPath)Runtime" SourceFiles="$(MSBuildThisFileDirectory)Runtime/internal.meta" />
-        <Copy DestinationFolder="$(OutputPath)Runtime/internal" SourceFiles="$(MSBuildThisFileDirectory)Runtime/internal/webrtc.deps.json.meta;$(MSBuildThisFileDirectory)Runtime/internal/webrtc.dll.meta;$(MSBuildThisFileDirectory)Runtime/internal/webrtc.pdb.meta" />
+        <Copy DestinationFolder="$(OutputPath)" SourceFiles="$(MSBuildThisFileDirectory)Runtime/internal.meta" />
+        <Copy DestinationFolder="$(OutputPath)internal" SourceFiles="$(MSBuildThisFileDirectory)RuntimeRuntime/internal/webrtc.deps.json.meta;$(MSBuildThisFileDirectory)Runtime/internal/webrtc.dll.meta;$(MSBuildThisFileDirectory)Runtime/internal/webrtc.pdb.meta" />
         <MSBuild
             Projects="../webrtc/webrtc.csproj"
-            Properties="AppendTargetFrameworkToOutputPath=false;BaseIntermediateOutputPath=$(AbsoluteBaseIntermediateOutputPath);DefineConstants=WEBRTC_INTERNAL;IntermediateOutputPath=$(AbsoluteIntermediateOutputPath)internal/;OutputPath=$(AbsoluteOutputPath)Runtime/internal/"
+            Properties="AppendTargetFrameworkToOutputPath=false;BaseIntermediateOutputPath=$(AbsoluteBaseIntermediateOutputPath);DefineConstants=WEBRTC_INTERNAL;IntermediateOutputPath=$(AbsoluteIntermediateOutputPath)internal/;OutputPath=$(AbsoluteOutputPath)internal/"
             Targets="Build" />
     </Target>
     <Target Condition="$(ParsibleTargets.Contains(';Ios;'))" Name="BuildIos" DependsOnTargets="BuildInternal">
@@ -123,10 +122,10 @@
         <Exec Command="gn desc --all --format=json $(EscapedIntermediateOutputPath)build/ios_libs/arm_libs //sdk:framework_objc > $(EscapedIntermediateOutputPath)desc/ios_libs/arm_libs/framework_objc.json" />
         <Exec Command="gn desc --all --format=json $(EscapedIntermediateOutputPath)build/ios_libs/arm64_libs //sdk:framework_objc > $(EscapedIntermediateOutputPath)desc/ios_libs/arm64_libs/framework_objc.json" />
         <Exec Command="gn desc --all --format=json $(EscapedIntermediateOutputPath)build/ios_libs/x64_libs //sdk:framework_objc > $(EscapedIntermediateOutputPath)desc/ios_libs/x64_libs/framework_objc.json" />
-        <RemoveDir Directories="$(OutputPath)Runtime/WebRTC.framework" />
-        <Exec Command="mv $(AbsoluteIntermediateOutputPath.Replace('\', '\\').Replace('&quot;', '\&quot;'))build/ios_libs/WebRTC.framework $(AbsoluteOutputPath.Replace('\', '\\').Replace('&quot;', '\&quot;'))Runtime" />
+        <RemoveDir Directories="$(OutputPath)WebRTC.framework" />
+        <Exec Command="mv $(AbsoluteIntermediateOutputPath.Replace('\', '\\').Replace('&quot;', '\&quot;'))build/ios_libs/WebRTC.framework $(AbsoluteOutputPath.Replace('\', '\\').Replace('&quot;', '\&quot;'))" />
         <Copy DestinationFolder="$(OutputPath)" SourceFiles="$(MSBuildThisFileDirectory)Editor.meta" />
-        <Copy DestinationFolder="$(OutputPath)Runtime" SourceFiles="$(MSBuildThisFileDirectory)Runtime/WebRTC.framework.meta" />
+        <Copy DestinationFolder="$(OutputPath)" SourceFiles="$(MSBuildThisFileDirectory)Runtime/WebRTC.framework.meta" />
         <Copy
             DestinationFolder="$(OutputPath)Editor"
             SourceFiles="$(MSBuildThisFileDirectory)Editor/AssemblyInfo.cs;$(MSBuildThisFileDirectory)Editor/Processor.cs;$(MSBuildThisFileDirectory)Editor/Processor.cs.meta;$(MSBuildThisFileDirectory)Editor/Webrtc.Editor.asmdef;$(MSBuildThisFileDirectory)Editor/Webrtc.Editor.asmdef.meta" />
@@ -138,7 +137,7 @@
         <Exec Command="ninja -C $(EscapedIntermediateOutputPath)build/linux_x64 :jingle_peerconnection_so" />
         <MakeDir Directories="$(IntermediateOutputPath)desc/linux_x64" />
         <Exec Command="gn desc --all --format=json $(EscapedIntermediateOutputPath)build/linux_x64 //:jingle_peerconnection_so > $(EscapedIntermediateOutputPath)desc/linux_x64/jingle_peerconnection_so.json" />
-        <Copy DestinationFolder="$(OutputPath)Runtime" SourceFiles="$(IntermediateOutputPath)build/linux_x64/libjingle_peerconnection_so.so;$(MSBuildThisFileDirectory)Runtime/libjingle_peerconnection_so.so.meta" />
+        <Copy DestinationFolder="$(OutputPath)" SourceFiles="$(IntermediateOutputPath)build/linux_x64/libjingle_peerconnection_so.so;$(MSBuildThisFileDirectory)Runtime/libjingle_peerconnection_so.so.meta" />
     </Target>
     <Target Condition="$(ParsibleTargets.Contains(';MacX64;'))" Name="BuildMacX64" DependsOnTargets="BuildExternal">
         <Exec
@@ -147,8 +146,8 @@
         <Exec Command="ninja -C $(EscapedIntermediateOutputPath)build/mac_x64 :jingle_peerconnection_so" />
         <MakeDir Directories="$(IntermediateOutputPath)desc/mac_x64" />
         <Exec Command="gn desc --all --format=json $(EscapedIntermediateOutputPath)build/mac_x64 //:jingle_peerconnection_so > $(EscapedIntermediateOutputPath)desc/mac_x64/jingle_peerconnection_so.json" />
-        <Copy DestinationFiles="$(OutputPath)Runtime/jingle_peerconnection_so.dylib" SourceFiles="$(IntermediateOutputPath)build/mac_x64/libjingle_peerconnection_so.dylib" />
-        <Copy DestinationFolder="$(OutputPath)Runtime" SourceFiles="$(MSBuildThisFileDirectory)Runtime/jingle_peerconnection_so.dylib.meta" />
+        <Copy DestinationFiles="$(OutputPath)jingle_peerconnection_so.dylib" SourceFiles="$(IntermediateOutputPath)build/mac_x64/libjingle_peerconnection_so.dylib" />
+        <Copy DestinationFolder="$(OutputPath)" SourceFiles="$(MSBuildThisFileDirectory)Runtime/jingle_peerconnection_so.dylib.meta" />
     </Target>
     <Target Condition="$(ParsibleTargets.Contains(';WinX64;'))" Name="BuildWinX64" DependsOnTargets="BuildExternal">
         <Exec
@@ -157,8 +156,8 @@
         <Exec Command="ninja -C $(EscapedIntermediateOutputPath)build/win_x64 :jingle_peerconnection_so" />
         <MakeDir Directories="$(IntermediateOutputPath)desc/win_x64" />
         <Exec Command="gn desc --all --format=json $(EscapedIntermediateOutputPath)build/win_x64 //:jingle_peerconnection_so > $(EscapedIntermediateOutputPath)desc/win_x64/jingle_peerconnection_so.json" />
-        <Copy DestinationFolder="$(OutputPath)Runtime" SourceFiles="$(IntermediateOutputPath)build/win_x64/jingle_peerconnection_so.dll;$(MSBuildThisFileDirectory)Runtime/jingle_peerconnection_so.dll.meta" />
-		<Copy DestinationFolder="$(OutputPath)Runtime" SourceFiles="$(IntermediateOutputPath)build/win_x64/jingle_peerconnection_so.dll.pdb" Condition="'$(Configuration)' == Debug" />
+        <Copy DestinationFolder="$(OutputPath)" SourceFiles="$(IntermediateOutputPath)build/win_x64/jingle_peerconnection_so.dll;$(MSBuildThisFileDirectory)Runtime/jingle_peerconnection_so.dll.meta" />
+		<Copy DestinationFolder="$(OutputPath)" SourceFiles="$(IntermediateOutputPath)build/win_x64/jingle_peerconnection_so.dll.pdb" Condition="'$(Configuration)' == Debug" />
     </Target>
     <Target Name="Restore">
         <ConvertToAbsolutePath Paths="$(BaseIntermediateOutputPath)">
@@ -169,7 +168,7 @@
         </ConvertToAbsolutePath>
         <MSBuild
             Projects="../webrtc/webrtc.csproj"
-            Properties="AppendTargetFrameworkToOutputPath=false;BaseIntermediateOutputPath=$(AbsoluteBaseIntermediateOutputPath);OutputPath=$(AbsoluteOutputPath)Runtime/"
+            Properties="AppendTargetFrameworkToOutputPath=false;BaseIntermediateOutputPath=$(AbsoluteBaseIntermediateOutputPath);OutputPath=$(AbsoluteOutputPath)"
             Targets="Restore" />
     </Target>
 </Project>
