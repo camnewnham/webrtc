@@ -5,7 +5,6 @@
     that can be found in the LICENSE file in the root of the source
     tree.
 	
-	AVAILABLE TARGETS Android;Ios;LinuxX64;MacX64;WinX64
 	AVAILABLE CONFIGURATIONS Debug, Release
 -->
 
@@ -19,7 +18,7 @@
     <PropertyGroup>
         <IsDebug Condition="'$(Configuration)' == Debug">true</IsDebug>
         <IsDebug Condition="'$(Configuration)' != Debug">false</IsDebug>
-        <Targets>WinX64;</Targets>
+        <Targets>Android;Ios;LinuxX64;MacX64;WinX64</Targets>
         <ParsibleTargets>;$(Targets);</ParsibleTargets>
         <SourceRootPath>$(MSBuildThisFileDirectory)../../../</SourceRootPath>
         <EscapedIntermediateOutputPath>"$(IntermediateOutputPath.Replace('\', '\\').Replace('"', '\"'))"</EscapedIntermediateOutputPath>
