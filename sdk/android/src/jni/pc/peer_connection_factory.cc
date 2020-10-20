@@ -82,7 +82,7 @@ void PostJavaCallback(JNIEnv* env,
     JavaAsyncCallback(JNIEnv* env,
                       const JavaRef<jobject>& j_object,
                       JavaMethodPointer java_method_pointer)
-        : rtc::MessageHandler(false),
+        : rtc::MessageHandler(),
           j_object_(env, j_object),
           java_method_pointer_(java_method_pointer) {}
 
