@@ -10,7 +10,7 @@
 #include "api/proxy.h"
 #include "sdk/c/api/peer_connection_interface.h"
 #include "sdk/c/modules/audio_device.h"
-#include <api\task_queue\default_task_queue_factory.h>
+#include "api/task_queue/default_task_queue_factory.h"
 
 namespace webrtc {
 
