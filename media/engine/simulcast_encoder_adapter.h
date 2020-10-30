@@ -27,6 +27,7 @@
 #include "rtc_base/atomic_ops.h"
 #include "rtc_base/synchronization/sequence_checker.h"
 #include "rtc_base/system/rtc_export.h"
+#include "rtc_base/constructor_magic.h"
 
 namespace webrtc {
 
@@ -73,7 +74,8 @@ class RTC_EXPORT SimulcastEncoderAdapter : public VideoEncoder {
       const CodecSpecificInfo* codec_specific_info);
 
   EncoderInfo GetEncoderInfo() const override;
-
+  RTC_DISALLOW_COPY_AND_ASSIGN(SimulcastEncoderAdapter);
+  
  private:
   struct StreamInfo {
     StreamInfo(std::unique_ptr<VideoEncoder> encoder,
