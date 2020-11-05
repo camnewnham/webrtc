@@ -96,7 +96,7 @@
             <Output TaskParameter="AbsolutePaths" PropertyName="AbsoluteOutputPath" />
         </ConvertToAbsolutePath>
         <Copy DestinationFolder="$(OutputPath)" SourceFiles="$(MSBuildThisFileDirectory)Runtime/internal.meta" />
-        <Copy DestinationFolder="$(OutputPath)internal" SourceFiles="$(MSBuildThisFileDirectory)RuntimeRuntime/internal/webrtc.deps.json.meta;$(MSBuildThisFileDirectory)Runtime/internal/webrtc.dll.meta;$(MSBuildThisFileDirectory)Runtime/internal/webrtc.pdb.meta" />
+        <Copy DestinationFolder="$(OutputPath)internal" SourceFiles="$(MSBuildThisFileDirectory)Runtime/internal/webrtc.deps.json.meta;$(MSBuildThisFileDirectory)Runtime/internal/webrtc.dll.meta;$(MSBuildThisFileDirectory)Runtime/internal/webrtc.pdb.meta" />
         <MSBuild
             Projects="../webrtc/webrtc.csproj"
             Properties="AppendTargetFrameworkToOutputPath=false;BaseIntermediateOutputPath=$(AbsoluteBaseIntermediateOutputPath);DefineConstants=WEBRTC_INTERNAL;IntermediateOutputPath=$(AbsoluteIntermediateOutputPath)internal/;OutputPath=$(AbsoluteOutputPath)internal/"
