@@ -22,7 +22,7 @@
 #include "call/bitrate_allocator.h"
 #include "modules/rtp_rtcp/source/rtp_rtcp_interface.h"
 #include "rtc_base/experiments/struct_parameters_parser.h"
-//#include "rtc_base/race_checker.h"
+#include "rtc_base/race_checker.h"
 #include "rtc_base/synchronization/mutex.h"
 #include "rtc_base/task_queue.h"
 #include "rtc_base/thread_checker.h"
@@ -152,7 +152,7 @@ class AudioSendStream final : public webrtc::AudioSendStream,
 
   rtc::ThreadChecker worker_thread_checker_;
   rtc::ThreadChecker pacer_thread_checker_;
-  //rtc::RaceChecker audio_capture_race_checker_;
+  rtc::RaceChecker audio_capture_race_checker_;
   rtc::TaskQueue* worker_queue_;
 
   const bool audio_send_side_bwe_;
