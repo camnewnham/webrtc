@@ -123,11 +123,7 @@
         <Exec Command="gn desc --all --format=json $(EscapedIntermediateOutputPath)build/ios_libs/x64_libs //sdk:framework_objc > $(EscapedIntermediateOutputPath)desc/ios_libs/x64_libs/framework_objc.json" />
         <RemoveDir Directories="$(OutputPath)WebRTC.framework" />
         <Exec Command="mv $(AbsoluteIntermediateOutputPath.Replace('\', '\\').Replace('&quot;', '\&quot;'))build/ios_libs/WebRTC.framework $(AbsoluteOutputPath.Replace('\', '\\').Replace('&quot;', '\&quot;'))" />
-        <Copy DestinationFolder="$(OutputPath)" SourceFiles="$(MSBuildThisFileDirectory)Editor.meta" />
         <Copy DestinationFolder="$(OutputPath)" SourceFiles="$(MSBuildThisFileDirectory)Runtime/WebRTC.framework.meta" />
-        <Copy
-            DestinationFolder="$(OutputPath)Editor"
-            SourceFiles="$(MSBuildThisFileDirectory)Editor/AssemblyInfo.cs;$(MSBuildThisFileDirectory)Editor/Processor.cs;$(MSBuildThisFileDirectory)Editor/Processor.cs.meta;$(MSBuildThisFileDirectory)Editor/Webrtc.Editor.asmdef;$(MSBuildThisFileDirectory)Editor/Webrtc.Editor.asmdef.meta" />
     </Target>
     <Target Condition="$(ParsibleTargets.Contains(';LinuxX64;'))" Name="BuildLinuxX64" DependsOnTargets="BuildExternal">
         <Exec
