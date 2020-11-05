@@ -26,6 +26,7 @@
 #include "media/base/vp9_profile.h"
 #include "modules/video_coding/codecs/vp9/include/vp9.h"
 #include "modules/video_coding/codecs/vp9/vp9_frame_buffer_pool.h"
+#include "modules/video_coding/svc/scalable_video_controller.h"
 #include "modules/video_coding/utility/framerate_controller.h"
 #include "vpx/vp8cx.h"
 #include "vpx/vpx_decoder.h"
@@ -131,7 +132,6 @@ class VP9EncoderImpl : public VP9Encoder {
   InterLayerPredMode inter_layer_pred_;
   bool external_ref_control_;
   const bool trusted_rate_controller_;
-  const bool dynamic_rate_settings_;
   bool layer_buffering_;
   const bool full_superframe_drop_;
   vpx_svc_frame_drop_t svc_drop_frame_;
@@ -139,7 +139,9 @@ class VP9EncoderImpl : public VP9Encoder {
   VideoBitrateAllocation current_bitrate_allocation_;
   bool ss_info_needed_;
   bool force_all_active_layers_;
+  const bool use_svc_controller_;
 
+  std::unique_ptr<ScalableVideoController> svc_controller_;
   std::vector<FramerateController> framerate_controller_;
 
   // Used for flexible mode.
@@ -163,6 +165,7 @@ class VP9EncoderImpl : public VP9Encoder {
     size_t temporal_layer_id = 0;
   };
   std::map<size_t, RefFrameBuffer> ref_buf_;
+  std::vector<ScalableVideoController::LayerFrameConfig> layer_frames_;
 
   // Variable frame-rate related fields and methods.
   const struct VariableFramerateExperiment {

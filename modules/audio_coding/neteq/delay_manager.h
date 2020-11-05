@@ -115,6 +115,7 @@ class DelayManager {
       packet_iat_stopwatch_;  // Time elapsed since last packet.
   int target_level_ms_;       // Currently preferred buffer level.
   uint32_t last_timestamp_;   // Timestamp for the last received packet.
+  int num_reordered_packets_ = 0;
 
   struct PacketDelay {
     int iat_delay_ms;

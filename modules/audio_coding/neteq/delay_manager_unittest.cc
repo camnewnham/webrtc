@@ -404,6 +404,28 @@ TEST_F(DelayManagerTest, RelativeArrivalDelay) {
   dm_->Update(ts_, kFs);
 }
 
+TEST_F(DelayManagerTest, ReorderedPackets) {
+  use_mock_histogram_ = true;
+  RecreateDelayManager();
+
+  // Insert first packet.
+  InsertNextPacket();
+
+  // Insert reordered packet.
+  EXPECT_CALL(*mock_histogram_, Add(4));
+  dm_->Update(ts_ - 5 * kTsIncrement, kFs);
+
+  // Insert another reordered packet.
+  EXPECT_CALL(*mock_histogram_, Add(1));
+  dm_->Update(ts_ - 2 * kTsIncrement, kFs);
+
+  // Insert the next packet in order and verify that the relative delay is
+  // estimated based on the first inserted packet.
+  IncreaseTime(4 * kFrameSizeMs);
+  EXPECT_CALL(*mock_histogram_, Add(3));
+  InsertNextPacket();
+}
+
 TEST_F(DelayManagerTest, MaxDelayHistory) {
   use_mock_histogram_ = true;
   RecreateDelayManager();

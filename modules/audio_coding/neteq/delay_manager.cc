@@ -37,6 +37,7 @@ constexpr int kMaxHistoryMs = 2000;  // Oldest packet to include in history to
 constexpr int kDelayBuckets = 100;
 constexpr int kBucketSizeMs = 20;
 constexpr int kStartDelayMs = 80;
+constexpr int kMaxNumReorderedPackets = 5;
 
 int PercentileToQuantile(double percentile) {
   return static_cast<int>((1 << 30) * percentile / 100.0 + 0.5);
@@ -130,6 +131,7 @@ absl::optional<int> DelayManager::Update(uint32_t timestamp,
     packet_iat_stopwatch_ = tick_timer_->GetNewStopwatch();
     last_timestamp_ = timestamp;
     first_packet_received_ = true;
+    num_reordered_packets_ = 0;
     return absl::nullopt;
   }
 
@@ -138,10 +140,9 @@ absl::optional<int> DelayManager::Update(uint32_t timestamp,
   const int iat_ms = packet_iat_stopwatch_->ElapsedMs();
   const int iat_delay_ms = iat_ms - expected_iat_ms;
   absl::optional<int> relative_delay;
-  if (!IsNewerTimestamp(timestamp, last_timestamp_)) {
+  bool reordered = !IsNewerTimestamp(timestamp, last_timestamp_);
+  if (reordered) {
     relative_delay = std::max(iat_delay_ms, 0);
-    // Reset the history and restart delay estimation from this packet.
-    delay_history_.clear();
   } else {
     UpdateDelayHistory(iat_delay_ms, timestamp, sample_rate_hz);
     relative_delay = CalculateRelativePacketArrivalDelay();
@@ -167,6 +168,16 @@ absl::optional<int> DelayManager::Update(uint32_t timestamp,
   }
 
   // Prepare for next packet arrival.
+  if (reordered) {
+    // Allow a small number of reordered packets before resetting the delay
+    // estimation.
+    if (num_reordered_packets_ < kMaxNumReorderedPackets) {
+      ++num_reordered_packets_;
+      return relative_delay;
+    }
+    delay_history_.clear();
+  }
+  num_reordered_packets_ = 0;
   packet_iat_stopwatch_ = tick_timer_->GetNewStopwatch();
   last_timestamp_ = timestamp;
   return relative_delay;
@@ -214,6 +225,7 @@ void DelayManager::Reset() {
   target_level_ms_ = kStartDelayMs;
   packet_iat_stopwatch_ = tick_timer_->GetNewStopwatch();
   first_packet_received_ = false;
+  num_reordered_packets_ = 0;
 }
 
 int DelayManager::TargetDelayMs() const {
