@@ -43,21 +43,22 @@ namespace Pixiv.Webrtc
 
         public static IntPtr FunctionsPtr { get { return functions.Ptr; } }
 
+		[MonoPInvokeCallback(typeof(OnDestructionDelegate))]
         private static void ObserverDestroyed(IntPtr context)
         {
             (((GCHandle)context).Target as IDataChannelObserver).OnObserverDestroyed();
         }
-
+		[MonoPInvokeCallback(typeof(OnStateChangeDelegate))]
         private static void StateChange(IntPtr context)
         {
             (((GCHandle)context).Target as IDataChannelObserver).OnStateChange();
         }
-
+		[MonoPInvokeCallback(typeof(OnMessageDelegate))]
         private static void Message(IntPtr context, bool binary, IntPtr data, int length)
         {
             (((GCHandle)context).Target as IDataChannelObserver).OnMessage(binary, data, length);
         }
-
+		[MonoPInvokeCallback(typeof(OnBufferedAmountChangeDelegate))]
         private static void BufferedAmountChange(IntPtr context, UInt64 sent_data_size)
         {
             (((GCHandle)context).Target as IDataChannelObserver).OnBufferedAmountChange(sent_data_size);
